@@ -9,10 +9,13 @@
 import UIKit
 import SceneKit
 import ARKit
+import SwiftyDropbox
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+class MainViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+    
+    @IBOutlet weak var addBtn: RoundButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,6 +73,43 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
+        
+    }
+    
+    @IBAction func btnAddTochDown(_ sender: Any) {
+        if let client = Dropbox.getDropboxClient()
+        {
+            print("Client loggato")
+            performSegue(withIdentifier: "toFilesTableViewController", sender: client)
+        }
+        else
+        {
+            print("Client non loggato")
+        }
+        
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if(segue.identifier=="toFilesTableViewController")
+        {
+            let destination = segue.destination as! FilesTableViewController
+            destination.client = sender as? DropboxClient
+        }
+    }
+    
+    //Support functions
+    
+    func authorizeApp(){
+        DropboxClientsManager.authorizeFromController(UIApplication.shared,
+                                                      controller: self,
+                                                      openURL: { (url: URL) -> Void in
+                                                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        })
+    }
+    
+    func exploreDropboxDirectory()
+    {
         
     }
 }
