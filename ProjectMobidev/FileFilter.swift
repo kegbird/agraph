@@ -31,45 +31,10 @@ struct FileFilter
         for file in arrayFiles
         {
             if regex.firstMatch(in: file.name, options: [], range: NSRange(location: 0, length: file.name.count)) != nil
-                && checkContent(file: file)
             {
                 result.append(file)
             }
         }
         return result
     }
-    
-    private func checkContent(file: Files.Metadata) -> Bool
-    {
-        let content = Dropbox.download(file: file)
-        var data = content.components(separatedBy: .newlines)
-        data.remove(at: 0)
-        
-        for line in data
-        {
-            let values = content.components(separatedBy: ";")
-            if !checkLine(line: values)
-            {
-                return false
-            }
-        }
-        
-        return true
-    }
-    
-    private func checkLine(line: [String]) -> Bool
-    {
-        if line.count != 6
-        {
-            return false
-        }
-        
-        if Float(line[0]) == nil || Float(line[1]) == nil || Float(line[2]) == nil || Int(line[3]) == nil || Int(line[4]) == nil || Int(line[5]) == nil
-        {
-            return false
-        }
-        
-        return true
-    }
-    
 }

@@ -13,35 +13,109 @@ import SwiftyDropbox
 
 class FilesTableViewController: UITableViewController {
 
-    var activityIndicator = UIActivityIndicatorView()
-    
     @IBOutlet weak var filesTable: UITableView!
     
+    var activityIndicator = UIActivityIndicatorView()
+    
     var client:DropboxClient?
+    
+    var files:[Files.Metadata]=[]
+    
+    var filesSelectedContent:[String]=[]
+    
+    var rpc:RpcRequest<Files.ListFolderResultSerializer, Files.ListFolderErrorSerializer>?
+    
+    var cellSelected = 0
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
         
+        setUp()
+        
+        downloadFileList()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if rpc != nil
+        {
+            rpc?.cancel()
+        }
+    }
+    
+    // MARK: - Table view data source
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return files.count
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+            if(indexPath.row<files.count)
+            {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: "fileCell", for: indexPath) as? FileTableCellView
+                {
+                    let file = files[indexPath.row]
+                    cell.fileName.text = file.name
+                    cell.filePath.text = file.pathDisplay
+                    return cell
+                }
+            }
+            return UITableViewCell()
+    }
+
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
+    {
+        tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCell.AccessoryType.checkmark
+        cellSelected = cellSelected + 1
+        self.navigationItem.rightBarButtonItem?.isEnabled = true
+    }
+    
+    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath)
+    {
+        tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCell.AccessoryType.none
+        cellSelected = cellSelected - 1
+        
+        if cellSelected == 0
+        {
+            self.navigationItem.rightBarButtonItem?.isEnabled = false
+        }
+    }
+    
+    func setUp()
+    {
+        cellSelected=0
+        filesSelectedContent = []
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(checkFiles))
+        self.navigationItem.rightBarButtonItem?.isEnabled = false
+        tableView.allowsMultipleSelection = true
         activityIndicator.center = self.view.center
-        
         activityIndicator.hidesWhenStopped = true
-        
         activityIndicator.style = UIActivityIndicatorView.Style.gray
-        
         view.addSubview(activityIndicator)
-        
         activityIndicator.startAnimating()
-        
-        
-        client?.files.listFolder(path: "", recursive: true).response(queue: DispatchQueue(label: "downloadFiles"), completionHandler: { (response, error) in
+        filesTable.delegate = self
+        filesTable.dataSource = self
+    }
+    
+    func downloadFileList()
+    {
+        rpc = client?.files.listFolder(path: "", recursive: true).response(queue: DispatchQueue(label: "downloadFiles"), completionHandler: { (response, error) in
             
             if let result = response
             {
                 let filter = FileFilter(root: "", extention: ".csv", arrayFiles: result.entries)
-                var extractedFiles = filter.extractFiles()
+                let extractedFiles = filter.extractFiles()
                 
                 DispatchQueue.main.async {
+                    self.files.removeAll()
+                    
+                    for file in extractedFiles
+                    {
+                        self.files.append(file)
+                    }
+                    
+                    self.filesTable.reloadData()
                     self.activityIndicator.stopAnimating()
                 }
             }
@@ -50,100 +124,52 @@ class FilesTableViewController: UITableViewController {
                 print("An error occurred during the fetch of files from dropbox:"+error.description)
             }
         })
-        
-        filesTable.delegate = self
-        filesTable.dataSource = self
-        
-        /*let task = URLSession.shared.dataTask(with: url!, completionHandler: {(data, response, error) in
-            guard let data = data, error == nil else { return }
-                
-            do {
-                /*var users: Users!
-                let decoder: JSONDecoder = JSONDecoder.init()
-                users = try decoder.decode(Users.self, from: data)
-                    
-                DispatchQueue.global().async { [weak self] in
-                    for x in users.users
-                    {
-                        self?.coreDataController.addUser(utente: x)
-                    }
-                    self?.activityIndicator.stopAnimating()
-                    self?.userList.reloadData()
-                        
-                }*/
-            } catch let error as NSError {
-                print(error)
-            }
-        })
-            
-        task.resume()*/
     }
     
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+    
+    func downloadSelectedFile(path: String)
+    {
+        client?.files.download(path: path)
+            .response { response, error in
+                if let response = response
+                {
+                    let stringContent = String(data: response.1, encoding: .utf8)
+                    if(CsvChecker.checkContent(fileContent: stringContent))
+                    {
+                        //su thread a parte syncrono, aggiorna l'array dei file
+                        DispatchQueue.main.async {
+                            self.filesSelectedContent.append(stringContent!)
+                            
+                            if self.filesSelectedContent.count == self.cellSelected
+                            {
+                                //ho finito e tutti i file sono validi
+                            }
+                            else
+                            {
+                                //gestire errore
+                            }
+                        }
+                    }
+                    
+                }
+                else if let error = error
+                {
+                    print(error)
+                    //gestire errore
+                }
+        }
     }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+    
+    @objc func checkFiles()
+    {
+        self.navigationItem.rightBarButtonItem?.isEnabled = false
+        for i in 0...cellSelected-1
+        {
+            if let path = files[i].pathLower
+            {
+                downloadSelectedFile(path: path)
+            }
+        }
     }
-
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
-        return cell
-    }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+    
 }

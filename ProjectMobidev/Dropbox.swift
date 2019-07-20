@@ -8,7 +8,6 @@
 
 import Foundation
 import SwiftyDropbox
-import Alamofire
 
 class Dropbox
 {
@@ -29,10 +28,5 @@ class Dropbox
     class func getDropboxClient() -> DropboxClient?
     {
         return DropboxClientsManager.authorizedClient
-    }
-    
-    class func download(file: Files.Metadata) -> String
-    {
-        return ""
     }
 }

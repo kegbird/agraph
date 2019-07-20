@@ -12,9 +12,9 @@
 		7009820B22DF763900BAE499 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 7009820A22DF763900BAE499 /* art.scnassets */; };
 		7009820D22DF763900BAE499 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7009820C22DF763900BAE499 /* MainViewController.swift */; };
 		7009821022DF763900BAE499 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7009820E22DF763900BAE499 /* Main.storyboard */; };
-		7009821222DF763A00BAE499 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7009821122DF763A00BAE499 /* Assets.xcassets */; };
 		7009821522DF763A00BAE499 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7009821322DF763A00BAE499 /* LaunchScreen.storyboard */; };
-		705708FA22DFC19C00A787E2 /* RoundButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705708F922DFC19C00A787E2 /* RoundButton.swift */; };
+		704D396F22E1D659000ABF18 /* FileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704D396E22E1D658000ABF18 /* FileCell.swift */; };
+		70F49C8A22E30F7D00881723 /* CsvChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F49C8922E30F7D00881723 /* CsvChecker.swift */; };
 		70F8F82822E07CA800F0371C /* FilesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F8F82722E07CA800F0371C /* FilesTableViewController.swift */; };
 		70F8F82A22E0A77700F0371C /* FileFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F8F82922E0A77700F0371C /* FileFilter.swift */; };
 		70F8F82C22E0A96F00F0371C /* Dropbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F8F82B22E0A96F00F0371C /* Dropbox.swift */; };
@@ -27,10 +27,10 @@
 		7009820A22DF763900BAE499 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
 		7009820C22DF763900BAE499 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		7009820F22DF763900BAE499 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		7009821122DF763A00BAE499 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7009821422DF763A00BAE499 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7009821622DF763A00BAE499 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		705708F922DFC19C00A787E2 /* RoundButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundButton.swift; sourceTree = "<group>"; };
+		704D396E22E1D658000ABF18 /* FileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCell.swift; sourceTree = "<group>"; };
+		70F49C8922E30F7D00881723 /* CsvChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CsvChecker.swift; sourceTree = "<group>"; };
 		70F8F82722E07CA800F0371C /* FilesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesTableViewController.swift; sourceTree = "<group>"; };
 		70F8F82922E0A77700F0371C /* FileFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFilter.swift; sourceTree = "<group>"; };
 		70F8F82B22E0A96F00F0371C /* Dropbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dropbox.swift; sourceTree = "<group>"; };
@@ -80,17 +80,17 @@
 		7009820722DF763900BAE499 /* ProjectMobidev */ = {
 			isa = PBXGroup;
 			children = (
-				7009820822DF763900BAE499 /* AppDelegate.swift */,
 				7009820A22DF763900BAE499 /* art.scnassets */,
-				7009820C22DF763900BAE499 /* MainViewController.swift */,
 				7009820E22DF763900BAE499 /* Main.storyboard */,
-				705708F922DFC19C00A787E2 /* RoundButton.swift */,
-				7009821122DF763A00BAE499 /* Assets.xcassets */,
 				7009821322DF763A00BAE499 /* LaunchScreen.storyboard */,
-				7009821622DF763A00BAE499 /* Info.plist */,
+				7009820822DF763900BAE499 /* AppDelegate.swift */,
+				7009820C22DF763900BAE499 /* MainViewController.swift */,
 				70F8F82722E07CA800F0371C /* FilesTableViewController.swift */,
+				70F49C8922E30F7D00881723 /* CsvChecker.swift */,
 				70F8F82922E0A77700F0371C /* FileFilter.swift */,
 				70F8F82B22E0A96F00F0371C /* Dropbox.swift */,
+				704D396E22E1D658000ABF18 /* FileCell.swift */,
+				7009821622DF763A00BAE499 /* Info.plist */,
 			);
 			path = ProjectMobidev;
 			sourceTree = "<group>";
@@ -165,7 +165,6 @@
 			files = (
 				7009820B22DF763900BAE499 /* art.scnassets in Resources */,
 				7009821522DF763A00BAE499 /* LaunchScreen.storyboard in Resources */,
-				7009821222DF763A00BAE499 /* Assets.xcassets in Resources */,
 				7009821022DF763900BAE499 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -221,8 +220,9 @@
 			files = (
 				70F8F82A22E0A77700F0371C /* FileFilter.swift in Sources */,
 				70F8F82822E07CA800F0371C /* FilesTableViewController.swift in Sources */,
+				704D396F22E1D659000ABF18 /* FileCell.swift in Sources */,
 				70F8F82C22E0A96F00F0371C /* Dropbox.swift in Sources */,
-				705708FA22DFC19C00A787E2 /* RoundButton.swift in Sources */,
+				70F49C8A22E30F7D00881723 /* CsvChecker.swift in Sources */,
 				7009820D22DF763900BAE499 /* MainViewController.swift in Sources */,
 				7009820922DF763900BAE499 /* AppDelegate.swift in Sources */,
 			);

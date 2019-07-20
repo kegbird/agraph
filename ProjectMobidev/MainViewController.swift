@@ -14,11 +14,11 @@ import SwiftyDropbox
 class MainViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
-    
-    @IBOutlet weak var addBtn: RoundButton!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addEvent))
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -36,7 +36,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
 
         // Run the view's session
@@ -49,17 +48,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         // Pause the view's session
         sceneView.session.pause()
     }
-
-    // MARK: - ARSCNViewDelegate
-    
-/*
-    // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
-     
-        return node
-    }
-*/
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
@@ -76,21 +64,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    @IBAction func btnAddTochDown(_ sender: Any) {
-        if let client = Dropbox.getDropboxClient()
-        {
-            print("Client loggato")
-            performSegue(withIdentifier: "toFilesTableViewController", sender: client)
-        }
-        else
-        {
-            print("Client non loggato")
-        }
-        
-    }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
         if(segue.identifier=="toFilesTableViewController")
         {
             let destination = segue.destination as! FilesTableViewController
@@ -98,18 +72,38 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     
-    //Support functions
+    @objc func addEvent()
+    {
+        if Dropbox.getDropboxClient() == nil
+        {
+            authorizeApp()
+        }
+        else
+        {
+            performSegue(withIdentifier: "toFilesTableViewController", sender: Dropbox.getDropboxClient())
+        }
+    }
+    
+    //Utility functions
     
     func authorizeApp(){
         DropboxClientsManager.authorizeFromController(UIApplication.shared,
                                                       controller: self,
                                                       openURL: { (url: URL) -> Void in
-                                                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                                                        UIApplication.shared.open(url, options: [:], completionHandler: self.checkAuthorization(status:))
         })
     }
     
-    func exploreDropboxDirectory()
+    func checkAuthorization(status: Bool)
     {
-        
+        if status
+        {
+            print("Client loggato")
+            performSegue(withIdentifier: "toFilesTableViewController", sender: Dropbox.getDropboxClient())
+        }
+        else
+        {
+            print("Client non loggato")
+        }
     }
 }
