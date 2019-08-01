@@ -13,9 +13,12 @@
 		7009820D22DF763900BAE499 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7009820C22DF763900BAE499 /* MainViewController.swift */; };
 		7009821022DF763900BAE499 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7009820E22DF763900BAE499 /* Main.storyboard */; };
 		7009821522DF763A00BAE499 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7009821322DF763A00BAE499 /* LaunchScreen.storyboard */; };
-		704D396F22E1D659000ABF18 /* FileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704D396E22E1D658000ABF18 /* FileCell.swift */; };
+		704D396F22E1D659000ABF18 /* FileCellTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704D396E22E1D658000ABF18 /* FileCellTableCellView.swift */; };
+		70515A3622EF4BDE00803192 /* DownloadFileListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70515A3522EF4BDE00803192 /* DownloadFileListViewController.swift */; };
+		70515A3822EF697C00803192 /* FilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70515A3722EF697C00803192 /* FilesViewController.swift */; };
+		7055503A22F07CEB009D315D /* DownloadFilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7055503922F07CEB009D315D /* DownloadFilesViewController.swift */; };
 		70F49C8A22E30F7D00881723 /* CsvChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F49C8922E30F7D00881723 /* CsvChecker.swift */; };
-		70F8F82822E07CA800F0371C /* FilesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F8F82722E07CA800F0371C /* FilesTableViewController.swift */; };
+		70F8F82822E07CA800F0371C /* asd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F8F82722E07CA800F0371C /* asd.swift */; };
 		70F8F82A22E0A77700F0371C /* FileFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F8F82922E0A77700F0371C /* FileFilter.swift */; };
 		70F8F82C22E0A96F00F0371C /* Dropbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70F8F82B22E0A96F00F0371C /* Dropbox.swift */; };
 /* End PBXBuildFile section */
@@ -29,9 +32,12 @@
 		7009820F22DF763900BAE499 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7009821422DF763A00BAE499 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7009821622DF763A00BAE499 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		704D396E22E1D658000ABF18 /* FileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCell.swift; sourceTree = "<group>"; };
+		704D396E22E1D658000ABF18 /* FileCellTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCellTableCellView.swift; sourceTree = "<group>"; };
+		70515A3522EF4BDE00803192 /* DownloadFileListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadFileListViewController.swift; sourceTree = "<group>"; };
+		70515A3722EF697C00803192 /* FilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesViewController.swift; sourceTree = "<group>"; };
+		7055503922F07CEB009D315D /* DownloadFilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadFilesViewController.swift; sourceTree = "<group>"; };
 		70F49C8922E30F7D00881723 /* CsvChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CsvChecker.swift; sourceTree = "<group>"; };
-		70F8F82722E07CA800F0371C /* FilesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesTableViewController.swift; sourceTree = "<group>"; };
+		70F8F82722E07CA800F0371C /* asd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = asd.swift; sourceTree = "<group>"; };
 		70F8F82922E0A77700F0371C /* FileFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFilter.swift; sourceTree = "<group>"; };
 		70F8F82B22E0A96F00F0371C /* Dropbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dropbox.swift; sourceTree = "<group>"; };
 		8A5100EB51B199E339EAF21A /* Pods-ProjectMobidev.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProjectMobidev.debug.xcconfig"; path = "Target Support Files/Pods-ProjectMobidev/Pods-ProjectMobidev.debug.xcconfig"; sourceTree = "<group>"; };
@@ -80,19 +86,46 @@
 		7009820722DF763900BAE499 /* ProjectMobidev */ = {
 			isa = PBXGroup;
 			children = (
+				70F0832F22E4D8C300D48AFE /* Storyboard */,
+				70F0832E22E4D8A600D48AFE /* Utility */,
+				70F0832D22E4D87900D48AFE /* View */,
 				7009820A22DF763900BAE499 /* art.scnassets */,
-				7009820E22DF763900BAE499 /* Main.storyboard */,
-				7009821322DF763A00BAE499 /* LaunchScreen.storyboard */,
 				7009820822DF763900BAE499 /* AppDelegate.swift */,
-				7009820C22DF763900BAE499 /* MainViewController.swift */,
-				70F8F82722E07CA800F0371C /* FilesTableViewController.swift */,
-				70F49C8922E30F7D00881723 /* CsvChecker.swift */,
-				70F8F82922E0A77700F0371C /* FileFilter.swift */,
-				70F8F82B22E0A96F00F0371C /* Dropbox.swift */,
-				704D396E22E1D658000ABF18 /* FileCell.swift */,
 				7009821622DF763A00BAE499 /* Info.plist */,
 			);
 			path = ProjectMobidev;
+			sourceTree = "<group>";
+		};
+		70F0832D22E4D87900D48AFE /* View */ = {
+			isa = PBXGroup;
+			children = (
+				70F8F82722E07CA800F0371C /* asd.swift */,
+				7009820C22DF763900BAE499 /* MainViewController.swift */,
+				704D396E22E1D658000ABF18 /* FileCellTableCellView.swift */,
+				70515A3722EF697C00803192 /* FilesViewController.swift */,
+				70515A3522EF4BDE00803192 /* DownloadFileListViewController.swift */,
+				7055503922F07CEB009D315D /* DownloadFilesViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		70F0832E22E4D8A600D48AFE /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				70F49C8922E30F7D00881723 /* CsvChecker.swift */,
+				70F8F82922E0A77700F0371C /* FileFilter.swift */,
+				70F8F82B22E0A96F00F0371C /* Dropbox.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		70F0832F22E4D8C300D48AFE /* Storyboard */ = {
+			isa = PBXGroup;
+			children = (
+				7009820E22DF763900BAE499 /* Main.storyboard */,
+				7009821322DF763A00BAE499 /* LaunchScreen.storyboard */,
+			);
+			path = Storyboard;
 			sourceTree = "<group>";
 		};
 		8A941BFEB2521BC28A719088 /* Frameworks */ = {
@@ -219,12 +252,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				70F8F82A22E0A77700F0371C /* FileFilter.swift in Sources */,
-				70F8F82822E07CA800F0371C /* FilesTableViewController.swift in Sources */,
-				704D396F22E1D659000ABF18 /* FileCell.swift in Sources */,
+				70F8F82822E07CA800F0371C /* asd.swift in Sources */,
+				70515A3622EF4BDE00803192 /* DownloadFileListViewController.swift in Sources */,
+				704D396F22E1D659000ABF18 /* FileCellTableCellView.swift in Sources */,
 				70F8F82C22E0A96F00F0371C /* Dropbox.swift in Sources */,
 				70F49C8A22E30F7D00881723 /* CsvChecker.swift in Sources */,
+				7055503A22F07CEB009D315D /* DownloadFilesViewController.swift in Sources */,
 				7009820D22DF763900BAE499 /* MainViewController.swift in Sources */,
 				7009820922DF763900BAE499 /* AppDelegate.swift in Sources */,
+				70515A3822EF697C00803192 /* FilesViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

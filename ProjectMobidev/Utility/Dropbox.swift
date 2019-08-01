@@ -16,13 +16,9 @@ class Dropbox
         DropboxClientsManager.setupWithAppKey("rkbj364everh4f4")
     }
     
-    private static var share: Dropbox = {
-        return Dropbox()
-    }()
-    
-    class func initialize() -> Dropbox
+    class func initialize()
     {
-        return share
+        let _ = Dropbox()
     }
     
     class func getDropboxClient() -> DropboxClient?

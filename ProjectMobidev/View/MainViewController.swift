@@ -14,12 +14,10 @@ import SwiftyDropbox
 class MainViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addEvent))
-        
+
         // Set the view's delegate
         sceneView.delegate = self
         
@@ -64,25 +62,19 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if(segue.identifier=="toFilesTableViewController")
-        {
-            let destination = segue.destination as! FilesTableViewController
-            destination.client = sender as? DropboxClient
-        }
-    }
+    //Event functions
     
-    @objc func addEvent()
-    {
+    @IBAction func btnAddTouchDown(_ sender: Any) {
         if Dropbox.getDropboxClient() == nil
         {
             authorizeApp()
         }
         else
         {
-            performSegue(withIdentifier: "toFilesTableViewController", sender: Dropbox.getDropboxClient())
+            self.performSegue(withIdentifier: "toDownloadFileListViewController", sender: nil)
         }
     }
+
     
     //Utility functions
     
@@ -99,7 +91,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         if status
         {
             print("Client loggato")
-            performSegue(withIdentifier: "toFilesTableViewController", sender: Dropbox.getDropboxClient())
+            performSegue(withIdentifier: "toDownloadFileListViewController", sender: nil)
         }
         else
         {
