@@ -25,6 +25,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             switch authResult {
             case .success:
                 print("Success! User is logged into Dropbox.")
+                
+                if window?.rootViewController is MainViewController
+                {
+                    window?.rootViewController?.performSegue(withIdentifier: "toDownloadFileListViewController", sender: nil)
+                }
+                
             case .cancel:
                 print("Authorization flow was manually canceled by user!")
             case .error(_, let description):

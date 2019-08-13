@@ -25,4 +25,9 @@ class Dropbox
     {
         return DropboxClientsManager.authorizedClient
     }
+    
+    class func deleteAccessToken()
+    {
+        DropboxClientsManager.unlinkClients()
+    }
 }

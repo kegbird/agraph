@@ -11,14 +11,11 @@ import SwiftyDropbox
 
 class DownloadFileListViewController: UIViewController {
     
-    @IBOutlet weak var popUpView: UIView!
-    
     @IBOutlet weak var infoLabel: UILabel!
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     override func viewDidLoad() {
-        setUp()
         downloadFileList()
     }
     
@@ -31,48 +28,65 @@ class DownloadFileListViewController: UIViewController {
         }
     }
     
-    func setUp()
-    {
-        popUpView.layer.cornerRadius = popUpView.bounds.height/4
-    }
-    
     func downloadFileList()
     {
-        Dropbox.getDropboxClient()?.files.listFolder(path: "", recursive: true).response(queue: DispatchQueue(label: "downloadFileList"), completionHandler: { (response, error) in
-            
-            if let result = response
-            {
-                let filter = FileFilter(root: "", extention: ".csv", arrayFiles: result.entries)
-                let extractedFiles = filter.extractFiles()
+        if Dropbox.getDropboxClient() != nil
+        {
+            Dropbox.getDropboxClient()?.files.listFolder(path: "", recursive: true).response(queue: DispatchQueue(label: "downloadFileList"), completionHandler: { (response, error) in
                 
-                DispatchQueue.main.async { [weak self] in
-                    var files:[Files.Metadata]=[]
+                if let result = response
+                {
+                    let filter = FileFilter(root: "", extention: ".csv", arrayFiles: result.entries)
+                    let extractedFiles = filter.extractFiles()
                     
-                    for file in extractedFiles
-                    {
-                        files.append(file)
+                    DispatchQueue.main.async { [weak self] in
+                        var files:[Files.Metadata]=[]
+                        
+                        for file in extractedFiles
+                        {
+                            files.append(file)
+                        }
+                        
+                        self?.performSegue(withIdentifier: "toFilesTableViewController", sender: files)
                     }
-                    
-                    self?.performSegue(withIdentifier: "toFilesTableViewController", sender: files)
                 }
-            }
-            else if error != nil
-            {
-                DispatchQueue.main.async { [weak self] in
-                    //Altrimenti display errore e ritorno alla scena precedente
-                    self?.activityIndicator.stopAnimating()
-                    
-                    let alert = UIAlertController(title: "Error", message: "An error occured during the data fetching from dropbox", preferredStyle: .alert)
-
-                    
-                    alert.addAction(UIAlertAction(title: "Ok", style: .destructive, handler: { (action) in
-                        self?.dismiss(animated: true, completion: nil)
-                    }))
-                    
-                    self?.present(alert, animated: true, completion: nil)
+                else if let error = error
+                {
+                    switch error as CallError
+                    {
+                    case .authError:
+                        Dropbox.deleteAccessToken()
+                        self.DisplayErrorPopUp(message: "An error occured during the data fetching from dropbox")
+                        break
+                    default:
+                        self.DisplayErrorPopUp(message: "An error occured during the data fetching from dropbox")
+                        break
+                        
+                    }
                 }
-            }
+            })
+        }
+        else
+        {
+            DisplayErrorPopUp(message: "An error occured during the data fetching from dropbox")
+        }
+    }
+    
+    func authorizeApp(){
+        DropboxClientsManager.authorizeFromController(UIApplication.shared,
+                                                      controller: self,
+                                                      openURL: { (url: URL) -> Void in
+                                                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
         })
     }
-
+    
+    func DisplayErrorPopUp(message: String)
+    {
+        DispatchQueue.main.async
+            { [weak self] in
+                self?.activityIndicator.stopAnimating()
+                
+                    Alert.DisplayPopUp(viewController: self, title: "Error", message: message, style: .destructive)
+        }
+    }
 }

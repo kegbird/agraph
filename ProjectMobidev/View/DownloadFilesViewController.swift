@@ -10,8 +10,6 @@ import UIKit
 
 class DownloadFilesViewController: UIViewController {
 
-    @IBOutlet weak var popUpView: UIView!
-    
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var filesToDownload : [String]=[]
@@ -22,13 +20,7 @@ class DownloadFilesViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUp()
         downloadFiles()
-    }
-
-    func setUp()
-    {
-        popUpView.layer.cornerRadius = popUpView.bounds.height/4
     }
     
     func downloadFiles()
