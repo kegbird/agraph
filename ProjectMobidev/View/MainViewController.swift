@@ -11,9 +11,24 @@ import SceneKit
 import ARKit
 import SwiftyDropbox
 
-class MainViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class MainViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+    
+    var editMode = false
+    
+    var initialPanLocation : SCNVector3?
+    
+    var lastPanLocation : SCNVector3?
+    
+    var draggingNode : SCNNode?
+    
+    override var prefersStatusBarHidden: Bool
+    {
+        return true
+    }
+    
+    //View Controller Events
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,12 +38,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIImagePickerCont
         
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
-        
-        sceneView.isUserInteractionEnabled = true
-        
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.tapEvent(withGestureRecognizer:)))
-        
-        sceneView.addGestureRecognizer(tapGestureRecognizer)
         
         // Create a new scene
         let scene = SCNScene(named: "art.scnassets/GraphScene.scn")!
@@ -63,7 +72,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIImagePickerCont
         sceneView.session.pause()
     }
     
-    //Ogni volta che trova una immagine, aggiunge un nodo tramite questa funzione
+    //AR Events
+    
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         
         let node = SCNNode()
@@ -93,7 +103,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIImagePickerCont
         return node
     }
     
-    //Event functions
+    //Input Events
     
     @IBAction func btnAddTouchDown(_ sender: Any) {
         
@@ -107,15 +117,65 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIImagePickerCont
         }
     }
     
-    @IBAction func btnTakePhotoTouchDown(_ sender: Any) {
-        
-        let snapShot = self.sceneView.snapshot()
-        
-        //2. Save It The Photos Album
-        UIImageWriteToSavedPhotosAlbum(snapShot, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+    @IBAction func tapEvent(_ gestureRecognizer: UITapGestureRecognizer)
+    {
+        guard gestureRecognizer.view != nil else { return }
+        print("Edit mode off")
+        editMode = false
     }
     
-    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+    @IBAction func panEvent(_ gestureRecognizer: UIPanGestureRecognizer)
+    {
+        guard gestureRecognizer.view != nil && editMode else { return }
+        let location = gestureRecognizer.location(in: sceneView)
+        
+        switch gestureRecognizer.state {
+        case .began:
+            print("pan begin")
+            guard let hitNodeResult = sceneView.hitTest(location, options: nil).first else { return }
+            initialPanLocation = sceneView.projectPoint(lastPanLocation!)
+            lastPanLocation = hitNodeResult.worldCoordinates
+            draggingNode = hitNodeResult.node
+            
+        case .changed:
+            let z = CGFloat(initialPanLocation!.z)
+            
+            let deltaVector = SCNVector3(x: Float(location.x), y: Float(location.y), z: Float(z))
+            
+            let worldTouchPosition = sceneView.unprojectPoint(deltaVector)
+            
+            let movementVector = SCNVector3(
+                worldTouchPosition.x - lastPanLocation!.x,
+                worldTouchPosition.y - lastPanLocation!.y,
+                worldTouchPosition.z - lastPanLocation!.z)
+            draggingNode?.localTranslate(by: movementVector)
+            self.lastPanLocation = worldTouchPosition
+        default:
+            print("pan end")
+        }
+    }
+    
+    @IBAction func longPressEvent(_ gestureRecognizer: UILongPressGestureRecognizer)
+    {
+        if gestureRecognizer.state == .began
+        {
+            let touchLocation = gestureRecognizer.location(in: sceneView)
+            let hitTest = sceneView?.hitTest(touchLocation, options: nil)
+            
+            if !hitTest!.isEmpty
+            {
+                print("Edit mode on")
+                editMode = true
+            }
+        }
+    }
+    
+    @IBAction func btnTakePhotoTouchDown(_ sender: Any) {
+        let snapShot = self.sceneView.snapshot()
+        UIImageWriteToSavedPhotosAlbum(snapShot, self, #selector(saveImageCallback(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    @objc func saveImageCallback(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
         
         if let error = error {
             print("Error Saving ARKit Scene \(error)")
@@ -124,13 +184,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIImagePickerCont
         }
     }
     
-    @objc func tapEvent(withGestureRecognizer recognizer: UIGestureRecognizer)
-    {
-        print("hi")
-    }
-
-    
     //Utility functions
+    
     func authorizeApp(){
         DropboxClientsManager.authorizeFromController(UIApplication.shared,
                                                       controller: self,

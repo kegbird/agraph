@@ -152,7 +152,7 @@
         <scene sceneID="tXr-a1-R10">
             <objects>
                 <viewController id="BV1-FR-VrT" customClass="MainViewController" customModule="ProjectMobidev" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="U0K-SW-4ec">
+                    <view key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" id="U0K-SW-4ec">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -234,6 +234,7 @@
                             </button>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="trailing" secondItem="qCj-r5-w6D" secondAttribute="trailing" id="8cS-wR-nrS"/>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="qCj-r5-w6D" secondAttribute="bottom" id="CkB-ZH-wzv"/>
@@ -251,6 +252,11 @@
                             <constraint firstItem="qCj-r5-w6D" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" id="xo4-HG-7F2"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="fQZ-KI-GVf"/>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="c36-5O-Qqn" appends="YES" id="7Z2-IJ-KjU"/>
+                            <outletCollection property="gestureRecognizers" destination="0kD-f3-JxM" appends="YES" id="8Ae-Ga-8jV"/>
+                            <outletCollection property="gestureRecognizers" destination="bUa-jr-jXk" appends="YES" id="dia-3Q-JKm"/>
+                        </connections>
                     </view>
                     <navigationItem key="navigationItem" id="cLL-NT-uDu"/>
                     <connections>
@@ -259,6 +265,21 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="c36-5O-Qqn">
+                    <connections>
+                        <action selector="tapEvent:" destination="BV1-FR-VrT" id="0SK-r5-XXo"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="0kD-f3-JxM">
+                    <connections>
+                        <action selector="panEvent:" destination="BV1-FR-VrT" id="xPW-MR-RTw"/>
+                    </connections>
+                </panGestureRecognizer>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="bUa-jr-jXk">
+                    <connections>
+                        <action selector="longPressEvent:" destination="BV1-FR-VrT" id="H6B-NQ-ZYM"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="460.86956521739131" y="18.75"/>
         </scene>
@@ -301,6 +322,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="632-wZ-Q7C"/>
+        <segue reference="du2-n2-l3g"/>
     </inferredMetricsTieBreakers>
 </document>
