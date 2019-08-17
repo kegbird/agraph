@@ -232,6 +232,15 @@
                                     <action selector="btnTakePhotoTouchDown:" destination="BV1-FR-VrT" eventType="touchUpInside" id="AN5-Q2-G37"/>
                                 </connections>
                             </button>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="crossAIr" translatesAutoresizingMaskIntoConstraints="NO" id="kMP-GG-eI0" userLabel="crossAir">
+                                <rect key="frame" x="193.5" y="434.5" width="27" height="27"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No graph to place" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LHP-fp-l2m" userLabel="infoLabel">
+                                <rect key="frame" x="115.5" y="77" width="183" height="29"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                         <gestureRecognizers/>
@@ -241,14 +250,18 @@
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="LWd-Wg-MpI" secondAttribute="bottom" constant="22" id="DTj-1K-KR1"/>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="70X-Qk-YCZ" secondAttribute="bottom" constant="20" id="EQH-dD-HGy"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GsS-dJ-CKf"/>
+                            <constraint firstItem="LHP-fp-l2m" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" constant="33" id="H2l-ZI-9Kp"/>
+                            <constraint firstItem="kMP-GG-eI0" firstAttribute="centerX" secondItem="U0K-SW-4ec" secondAttribute="centerX" id="IND-IY-48J"/>
                             <constraint firstItem="z4p-s6-zKl" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" constant="20" id="Mxk-FW-wZG"/>
                             <constraint firstItem="70X-Qk-YCZ" firstAttribute="centerX" secondItem="U0K-SW-4ec" secondAttribute="centerX" id="R2C-om-Fzg"/>
+                            <constraint firstItem="kMP-GG-eI0" firstAttribute="centerY" secondItem="U0K-SW-4ec" secondAttribute="centerY" id="U6Z-hT-J1i"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="bottom" secondItem="fQZ-KI-GVf" secondAttribute="bottom" id="VpT-BR-CcM"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="XyZ-9z-H8e"/>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="z4p-s6-zKl" secondAttribute="bottom" constant="20" id="a3k-RT-diy"/>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="trailing" secondItem="LWd-Wg-MpI" secondAttribute="trailing" constant="20" id="cAS-5e-Geq"/>
                             <constraint firstItem="qCj-r5-w6D" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="kUI-wu-ed5"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="top" secondItem="U0K-SW-4ec" secondAttribute="top" id="rJc-2c-zQA"/>
+                            <constraint firstItem="LHP-fp-l2m" firstAttribute="centerX" secondItem="U0K-SW-4ec" secondAttribute="centerX" id="sBC-Ns-1O3"/>
                             <constraint firstItem="qCj-r5-w6D" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" id="xo4-HG-7F2"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="fQZ-KI-GVf"/>
@@ -275,7 +288,7 @@
                         <action selector="panEvent:" destination="BV1-FR-VrT" id="xPW-MR-RTw"/>
                     </connections>
                 </panGestureRecognizer>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="bUa-jr-jXk">
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.40000000000000002" id="bUa-jr-jXk">
                     <connections>
                         <action selector="longPressEvent:" destination="BV1-FR-VrT" id="H6B-NQ-ZYM"/>
                     </connections>
@@ -321,6 +334,9 @@
             <point key="canvasLocation" x="3276.811594202899" y="-250.44642857142856"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="crossAIr" width="27" height="27"/>
+    </resources>
     <inferredMetricsTieBreakers>
         <segue reference="du2-n2-l3g"/>
     </inferredMetricsTieBreakers>
