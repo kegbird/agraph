@@ -41,6 +41,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         
+        sceneView.debugOptions = SCNDebugOptions.showWorldOrigin
+        
         // Create a new scene
         let scene = SCNScene(named: "art.scnassets/GraphScene.scn")!
         
@@ -88,29 +90,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         return node
     }
     
-    //View input
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        if let location = touches.first?.location(in: sceneView)
-        {
-            let result = getTouchedObject(location: location)
-            
-            if isInteractiveObject(object: result)
-            {
-                selectedObject = result?.node
-                highlightSelectedObject()
-            }
-            
-            selectedObject = nil
-            editMode=false
-        }
-    }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         if selectedObject != nil
         {
+            selectedObject?.removeAllActions()
             hideSelectedObject()
             selectedObject = nil
         }
@@ -144,11 +130,19 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         }
     }
 
+    //
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        
+    }
+    
     //Gesture recognizer actions
     
     @IBAction func tapEvent(_ gestureRecognizer: UITapGestureRecognizer)
     {
         guard gestureRecognizer.view != nil else { return }
+        print("touch")
     }
     
     @IBAction func panEvent(_ gestureRecognizer: UIPanGestureRecognizer)
@@ -182,18 +176,27 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
     
     @IBAction func longPressEvent(_ gestureRecognizer: UILongPressGestureRecognizer)
     {
-        /*switch gestureRecognizer.state {
+        switch gestureRecognizer.state {
         case .began:
-            print("began")
-            break
-        case .possible:
-            print("possible")
-            break
-        case .cancelled:
-            print("cancelled")
+            let location = gestureRecognizer.location(in: sceneView)
+            let result = getTouchedObject(location: location)
+            if isInteractiveObject(object: result)
+            {
+                editMode = true
+                selectedObject = result?.node
+                highlightSelectedObject()
+                shakeAllObjects()
+            }
+
             break
         case .ended:
-            print("ended")
+            if selectedObject != nil
+            {
+                print("deselezionato")
+                selectedObject?.removeAllActions()
+                hideSelectedObject()
+                selectedObject = nil
+            }
             break
         case .changed:
             print("changed")
@@ -204,7 +207,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         default:
             print("default")
             break
-        }*/
+        }
         /*if gestureRecognizer.state == .began
         {
             let touchLocation = gestureRecognizer.location(in: sceneView)
@@ -220,32 +223,58 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
     
     //Utility functions
     
+    func shakeAllObjects()
+    {
+        for graph in graphs
+        {
+            let a1 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.05)
+            let a2 = SCNAction.rotateBy(x: 0, y: 0, z: -0.1, duration: 0.05)
+            let a3 = SCNAction.rotateBy(x: 0, y: 0, z: -0.1, duration: 0.05)
+            let a4 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.05)
+            let sequence = SCNAction.sequence([a1,a2,a3,a4])
+            let animation = SCNAction.repeatForever(sequence)
+            graph?.runAction(animation)
+        }
+    }
+    
     func highlightSelectedObject()
     {
         guard selectedObject != nil else { return }
         
-        let oldColor = UIColor.red
-        let newColor = UIColor(red: 207, green: 0, blue: 1, alpha: 1)
+        let currentColor = selectedObject?.geometry?.materials.first?.diffuse.contents as! UIColor
         
-        let duration: TimeInterval = 0.1
-        let act0 = SCNAction.customAction(duration: duration, action: { (node, elapsedTime) in
+        let selectedColor = UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 1.0)
+        
+        let duration: TimeInterval = 0.2
+        
+        let animation = SCNAction.customAction(duration: duration, action: { (node, elapsedTime) in
             let percentage = elapsedTime / CGFloat(duration)
-            node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: newColor, to: oldColor, percentage: percentage)
+            node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: currentColor, to: selectedColor, percentage: percentage)
         })
         
-        let act = SCNAction.sequence([act0])
-        selectedObject?.runAction(act)
+        selectedObject?.runAction(animation)
     }
     
     func hideSelectedObject()
     {
         
+        let currentColor =  selectedObject?.geometry?.materials.first?.diffuse.contents as! UIColor
+        
+        let selectedColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        
+        let duration: TimeInterval = 0.2
+        
+        let animation = SCNAction.customAction(duration: duration, action: { (node, elapsedTime) in
+            let percentage = elapsedTime / CGFloat(duration)
+            node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: currentColor, to: selectedColor, percentage: percentage)
+        })
+        
+        selectedObject?.runAction(animation)
     }
     
     func changeColor(from: UIColor, to: UIColor, percentage: CGFloat) -> UIColor {
         let fromComponents = from.cgColor.components!
         let toComponents = to.cgColor.components!
-        
         let color = UIColor(red: fromComponents[0] + (toComponents[0] - fromComponents[0]) * percentage,
                             green: fromComponents[1] + (toComponents[1] - fromComponents[1]) * percentage,
                             blue: fromComponents[2] + (toComponents[2] - fromComponents[2]) * percentage,
@@ -301,10 +330,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         
         if graphs.contains(node)
         {
-            print("yikes")
+            return true
         }
         
-        return true
+        return false
     }
     
     func getTouchedObject(location: CGPoint) -> SCNHitTestResult?

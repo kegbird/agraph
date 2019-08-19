@@ -288,7 +288,7 @@
                         <action selector="panEvent:" destination="BV1-FR-VrT" id="xPW-MR-RTw"/>
                     </connections>
                 </panGestureRecognizer>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.40000000000000002" id="bUa-jr-jXk">
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.10000000000000001" id="bUa-jr-jXk">
                     <connections>
                         <action selector="longPressEvent:" destination="BV1-FR-VrT" id="H6B-NQ-ZYM"/>
                     </connections>
