@@ -23,6 +23,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
     
     var selectedObject : SCNNode?
     
+    var originalScale = Float(0)
+    
+    var originalColor = UIColor.white
+    
     var graphs : [SCNNode?] = []
     
     override var prefersStatusBarHidden: Bool
@@ -90,18 +94,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         return node
     }
     
-    
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        if selectedObject != nil
-        {
-            selectedObject?.removeAllActions()
-            hideSelectedObject()
-            selectedObject = nil
-        }
-    }
-    
     //Input buttons
     
     @IBAction func btnAddTouchDown(_ sender: Any) {
@@ -134,16 +126,21 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        
+        if editMode, let location = touches.first?.location(in: sceneView)
+        {
+            if !isInteractiveObject(object: getTouchedObject(location: location))
+            {
+                print("edit mode off")
+                stopAllShakingObjects()
+                editMode = false
+                selectedObject = nil
+                originalScale = 0
+                originalColor = UIColor.white
+            }
+        }
     }
     
     //Gesture recognizer actions
-    
-    @IBAction func tapEvent(_ gestureRecognizer: UITapGestureRecognizer)
-    {
-        guard gestureRecognizer.view != nil else { return }
-        print("touch")
-    }
     
     @IBAction func panEvent(_ gestureRecognizer: UIPanGestureRecognizer)
     {
@@ -182,10 +179,15 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
             let result = getTouchedObject(location: location)
             if isInteractiveObject(object: result)
             {
-                editMode = true
                 selectedObject = result?.node
                 highlightSelectedObject()
-                shakeAllObjects()
+                
+                if !editMode
+                {
+                    print("edit mode on")
+                    editMode = true
+                    shakeAllObjects()
+                }
             }
 
             break
@@ -193,7 +195,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
             if selectedObject != nil
             {
                 print("deselezionato")
-                selectedObject?.removeAllActions()
                 hideSelectedObject()
                 selectedObject = nil
             }
@@ -203,6 +204,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
             break
         case .failed:
             print("failed")
+            break
+        case .possible:
+            print("possible")
             break
         default:
             print("default")
@@ -233,7 +237,16 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
             let a4 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.05)
             let sequence = SCNAction.sequence([a1,a2,a3,a4])
             let animation = SCNAction.repeatForever(sequence)
-            graph?.runAction(animation)
+            graph?.runAction(animation, forKey: "shake")
+        }
+    }
+    
+    func stopAllShakingObjects()
+    {
+        for graph in graphs
+        {
+            graph?.removeAction(forKey: "shake")
+            graph?.rotation = SCNVector4(x:0, y:0, z:0, w:1)
         }
     }
     
@@ -243,16 +256,28 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         
         let currentColor = selectedObject?.geometry?.materials.first?.diffuse.contents as! UIColor
         
-        let selectedColor = UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 1.0)
+        originalColor = currentColor
+        
+        let selectedColor = UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 255/255)
         
         let duration: TimeInterval = 0.2
         
-        let animation = SCNAction.customAction(duration: duration, action: { (node, elapsedTime) in
+        let colorAnimation = SCNAction.customAction(duration: duration, action: { (node, elapsedTime) in
             let percentage = elapsedTime / CGFloat(duration)
             node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: currentColor, to: selectedColor, percentage: percentage)
         })
         
-        selectedObject?.runAction(animation)
+        
+        let scaleAnimation : SCNAction
+        
+        originalScale = Float(selectedObject?.scale.x ?? 1)
+        
+        var finalScale = selectedObject?.scale.x ?? 1
+        finalScale = finalScale * 1.1
+        scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
+        
+        selectedObject?.runAction(colorAnimation)
+        selectedObject?.runAction(scaleAnimation)
     }
     
     func hideSelectedObject()
@@ -260,16 +285,21 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         
         let currentColor =  selectedObject?.geometry?.materials.first?.diffuse.contents as! UIColor
         
-        let selectedColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        let duration: TimeInterval = 0.1
         
-        let duration: TimeInterval = 0.2
-        
-        let animation = SCNAction.customAction(duration: duration, action: { (node, elapsedTime) in
+        let colorAnimation = SCNAction.customAction(duration: 0.2, action: { (node, elapsedTime) in
             let percentage = elapsedTime / CGFloat(duration)
-            node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: currentColor, to: selectedColor, percentage: percentage)
+            node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: currentColor, to: self.originalColor, percentage: percentage)
         })
         
-        selectedObject?.runAction(animation)
+        let scaleAnimation : SCNAction
+        
+        let finalScale = originalScale
+        
+        scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
+        
+        selectedObject?.runAction(colorAnimation)
+        selectedObject?.runAction(scaleAnimation)
     }
     
     func changeColor(from: UIColor, to: UIColor, percentage: CGFloat) -> UIColor {

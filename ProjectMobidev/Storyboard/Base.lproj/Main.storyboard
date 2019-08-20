@@ -266,7 +266,6 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="fQZ-KI-GVf"/>
                         <connections>
-                            <outletCollection property="gestureRecognizers" destination="c36-5O-Qqn" appends="YES" id="7Z2-IJ-KjU"/>
                             <outletCollection property="gestureRecognizers" destination="0kD-f3-JxM" appends="YES" id="8Ae-Ga-8jV"/>
                             <outletCollection property="gestureRecognizers" destination="bUa-jr-jXk" appends="YES" id="dia-3Q-JKm"/>
                         </connections>
@@ -278,17 +277,12 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="c36-5O-Qqn">
-                    <connections>
-                        <action selector="tapEvent:" destination="BV1-FR-VrT" id="0SK-r5-XXo"/>
-                    </connections>
-                </tapGestureRecognizer>
                 <panGestureRecognizer minimumNumberOfTouches="1" id="0kD-f3-JxM">
                     <connections>
                         <action selector="panEvent:" destination="BV1-FR-VrT" id="xPW-MR-RTw"/>
                     </connections>
                 </panGestureRecognizer>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.10000000000000001" id="bUa-jr-jXk">
+                <pongPressGestureRecognizer allowableMovement="0.0" minimumPressDuration="0.10000000000000001" id="bUa-jr-jXk">
                     <connections>
                         <action selector="longPressEvent:" destination="BV1-FR-VrT" id="H6B-NQ-ZYM"/>
                     </connections>
