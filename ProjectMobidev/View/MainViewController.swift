@@ -11,15 +11,15 @@ import SceneKit
 import ARKit
 import SwiftyDropbox
 
-class MainViewController: UIViewController, ARSCNViewDelegate {
+class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecognizerDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
     var editMode = false
     
-    var initialPanDepth : CGFloat?
+    //var initialPanDepth : CGFloat?
     
-    var lastPanLocation : SCNVector3?
+    var lastPanLocation : SCNVector3!
     
     var selectedObject : SCNNode?
     
@@ -28,6 +28,16 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
     var originalColor = UIColor.white
     
     var graphs : [SCNNode?] = []
+    
+    var initialPanDepth : CGFloat?
+    
+    var referencePlaneNode : SCNNode!
+    
+    var minBound = SCNVector3(x:0, y:0, z:0)
+    
+    var maxBound = SCNVector3(x:0, y:0, z:0)
+    
+    let distanceFromPlane : Float = 0.15
     
     override var prefersStatusBarHidden: Bool
     {
@@ -44,8 +54,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
-        
-        sceneView.debugOptions = SCNDebugOptions.showWorldOrigin
         
         // Create a new scene
         let scene = SCNScene(named: "art.scnassets/GraphScene.scn")!
@@ -135,40 +143,64 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
                 editMode = false
                 selectedObject = nil
                 originalScale = 0
-                originalColor = UIColor.white
+                originalColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 255/255)
             }
         }
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        if otherGestureRecognizer is UILongPressGestureRecognizer
+        {
+            return true
+        }
+        
+        return false
     }
     
     //Gesture recognizer actions
     
     @IBAction func panEvent(_ gestureRecognizer: UIPanGestureRecognizer)
     {
-        guard gestureRecognizer.view != nil && editMode else { return }
-        /*let location = gestureRecognizer.location(in: sceneView)
+        guard gestureRecognizer.view != nil, referencePlaneNode != nil else { return }
+        
+        let location = gestureRecognizer.location(in: sceneView)
+        let hitTestResult = sceneView.hitTest(location, options: nil).first
         
         switch gestureRecognizer.state {
         case .began:
             //Controllo se c'è qualcosa da muovere
-            guard let hitTestResult = sceneView.hitTest(location, options: nil).first else { return }
-            lastPanLocation = hitTestResult.worldCoordinates
+            guard editMode, selectedObject != nil else { return }
+            lastPanLocation = hitTestResult!.worldCoordinates
             initialPanDepth = CGFloat(sceneView.projectPoint(lastPanLocation!).z)
-            selectedObject = hitTestResult.node
-            print(lastPanLocation)
+            
         case .changed:
+            guard editMode, selectedObject != nil else { return }
+            
             let worldTouchPosition = sceneView.unprojectPoint(SCNVector3(location.x, location.y, initialPanDepth!))
+            
             let movementVector = SCNVector3(
                 worldTouchPosition.x - lastPanLocation!.x,
                 worldTouchPosition.y - lastPanLocation!.y,
-                worldTouchPosition.z - lastPanLocation!.z)
-            selectedObject?.localTranslate(by: movementVector)
+                0)
+            
+            
+            if var finalPosition = selectedObject?.position
+            {
+                finalPosition.x = simd_clamp(movementVector.x + finalPosition.x, minBound.x, maxBound.x)
+                
+                finalPosition.y = simd_clamp(movementVector.y + finalPosition.y, minBound.y, maxBound.y)
+                
+                selectedObject?.position = finalPosition
+            }
+            
             self.lastPanLocation = worldTouchPosition
-            print(lastPanLocation)
+            
             break
         default:
             print("stop pan")
             break
-        }*/
+        }
     }
     
     @IBAction func longPressEvent(_ gestureRecognizer: UILongPressGestureRecognizer)
@@ -212,20 +244,45 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
             print("default")
             break
         }
-        /*if gestureRecognizer.state == .began
-        {
-            let touchLocation = gestureRecognizer.location(in: sceneView)
-            let hitTest = sceneView?.hitTest(touchLocation, options: nil)
-            
-            if !hitTest!.isEmpty
-            {
-                print("Edit mode on")
-                editMode = true
-            }
-        }*/
     }
     
     //Utility functions
+    
+    func getPlaneNormal() -> SCNVector3
+    {
+        let (min,max) = referencePlaneNode.boundingBox.self
+        
+        let normal = SCNVector3(x: max.y * min.z - max.z * min.y,
+                                y: max.z * min.x - max.x * min.z,
+                                z: max.x * min.y - max.y * min.x)
+        
+        print(normal)
+        
+        return normal
+    }
+    
+    /*func calculateTranslation(hitTestResult: SCNHitTestResult) -> SCNVector3
+    {
+        /*var normalPlane = SCNVector4(0,0,1,0)
+        
+        let dotProd = normalPlane.x*movementVector.x + normalPlane.y*movementVector.y + normalPlane.z*movementVector.z
+        
+        normalPlane.x=normalPlane.x*dotProd
+        
+        normalPlane.y=normalPlane.y*dotProd
+        
+        normalPlane.z=normalPlane.z*dotProd
+        
+        let projection = SCNVector3(movementVector.x - normalPlane.x, movementVector.y - normalPlane.y, movementVector.z - normalPlane.z)*/
+        
+        /*let worldBottomLeft = referencePlaneNode.convertPosition(bottomLeft, to: referencePlaneNode.parent)
+        
+        let worldTopRight = referencePlaneNode.convertPosition(topRight, to: referencePlaneNode.parent)
+        
+        let worldBottomRight = referencePlaneNode.convertPosition(bottomRight, to: referencePlaneNode.parent)*/
+        
+        return movementVector
+    }*/
     
     func shakeAllObjects()
     {
@@ -273,7 +330,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         originalScale = Float(selectedObject?.scale.x ?? 1)
         
         var finalScale = selectedObject?.scale.x ?? 1
-        finalScale = finalScale * 1.1
+        finalScale = finalScale * 1.25
         scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
         
         selectedObject?.runAction(colorAnimation)
@@ -308,48 +365,54 @@ class MainViewController: UIViewController, ARSCNViewDelegate {
         let color = UIColor(red: fromComponents[0] + (toComponents[0] - fromComponents[0]) * percentage,
                             green: fromComponents[1] + (toComponents[1] - fromComponents[1]) * percentage,
                             blue: fromComponents[2] + (toComponents[2] - fromComponents[2]) * percentage,
-                            alpha: fromComponents[3] + (toComponents[3] - fromComponents[3]) * percentage)
+                            alpha: toComponents[3])
         return color
     }
     
     func displayWhitePlane(imageAnchor: ARImageAnchor, node: SCNNode)
     {
         DispatchQueue.main.async
-        { [weak self] in
-            let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
-            
-            plane.firstMaterial?.diffuse.contents = UIColor(white: 1, alpha: 0.8)
-            
-            let planeNode = SCNNode(geometry: plane)
-            
-            planeNode.eulerAngles.x = -.pi/2
-            
-            node.addChildNode(planeNode)
-            
-            let (min, max) = planeNode.boundingBox
-            
-            let size = SCNVector3Make(max.x - min.x, max.y - min.y, max.z - min.z)
-            
-            let widthRatio = Float(imageAnchor.referenceImage.physicalSize.width)/size.x
-            let heightRatio = Float(imageAnchor.referenceImage.physicalSize.height)/size.z
-            // Pick smallest value to be sure that object fits into the image.
-            let finalRatio = [widthRatio, heightRatio].min()!
-            
-            let appearAnimation = SCNAction.scale(to: CGFloat(finalRatio), duration: 0.4)
-            
-            appearAnimation.timingMode = .easeOut
-            
-            planeNode.scale = SCNVector3(0.001, 0.001, 0.001)
-            
-            planeNode.runAction(appearAnimation)
-            if let shipScene = SCNScene(named: "art.scnassets/ship.scn")
-            {
-                 let shipNode = shipScene.rootNode.childNodes.first
-                 shipNode?.position = SCNVector3Zero
-                 shipNode?.position.z = 0.15
-                 self?.graphs.append(shipNode)
-                 planeNode.addChildNode(shipNode!)
-            }
+            { [weak self] in
+                let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
+                
+                plane.firstMaterial?.diffuse.contents = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.8)
+                
+                let planeNode = SCNNode(geometry: plane)
+                
+                planeNode.eulerAngles.x = -.pi/2
+                
+                node.addChildNode(planeNode)
+                
+                var (min, max) = planeNode.boundingBox
+                
+                let size = SCNVector3Make(max.x - min.x, max.y - min.y, max.z - min.z)
+                
+                let widthRatio = Float(imageAnchor.referenceImage.physicalSize.width)/size.x
+                let heightRatio = Float(imageAnchor.referenceImage.physicalSize.height)/size.z
+                // Pick smallest value to be sure that object fits into the image.
+                let finalRatio = [widthRatio, heightRatio].min()!
+                
+                let appearAnimation = SCNAction.scale(to: CGFloat(finalRatio), duration: 0.4)
+                
+                appearAnimation.timingMode = .easeOut
+                
+                planeNode.scale = SCNVector3(0.001, 0.001, 0.001)
+                
+                planeNode.runAction(appearAnimation)
+                
+                self?.minBound = min
+                
+                self?.maxBound = max
+                
+                if let shipScene = SCNScene(named: "art.scnassets/ship.scn")
+                {
+                    let shipNode = shipScene.rootNode.childNodes.first
+                    shipNode?.position = SCNVector3(x: 0, y: 0, z: self!.distanceFromPlane)
+                    self?.graphs.append(shipNode)
+                    planeNode.addChildNode(shipNode!)
+                }
+                
+                self?.referencePlaneNode = node
         }
     }
     

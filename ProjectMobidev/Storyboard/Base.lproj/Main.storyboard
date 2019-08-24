@@ -280,9 +280,10 @@
                 <panGestureRecognizer minimumNumberOfTouches="1" id="0kD-f3-JxM">
                     <connections>
                         <action selector="panEvent:" destination="BV1-FR-VrT" id="xPW-MR-RTw"/>
+                        <outlet property="delegate" destination="BV1-FR-VrT" id="HYT-50-L5u"/>
                     </connections>
                 </panGestureRecognizer>
-                <pongPressGestureRecognizer allowableMovement="0.0" minimumPressDuration="0.10000000000000001" id="bUa-jr-jXk">
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.10000000000000001" id="bUa-jr-jXk">
                     <connections>
                         <action selector="longPressEvent:" destination="BV1-FR-VrT" id="H6B-NQ-ZYM"/>
                     </connections>
