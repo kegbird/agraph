@@ -12,12 +12,10 @@ import ARKit
 import SwiftyDropbox
 
 class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecognizerDelegate {
-
+    
     @IBOutlet var sceneView: ARSCNView!
     
     var editMode = false
-    
-    //var initialPanDepth : CGFloat?
     
     var lastPanLocation : SCNVector3!
     
@@ -27,7 +25,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var originalColor = UIColor.white
     
-    var graphs : [SCNNode?] = []
+    var graphs : [SCNNode] = []
+    
+    var removeGraphButtons : [SCNNode] = []
     
     var initialPanDepth : CGFloat?
     
@@ -39,6 +39,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     let distanceFromPlane : Float = 0.15
     
+    let buttonScale = SCNVector3(x: 0.035, y: 0.035, z: 0.035)
+    
     override var prefersStatusBarHidden: Bool
     {
         return true
@@ -48,7 +50,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Set the view's delegate
         sceneView.delegate = self
         
@@ -68,7 +70,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         let configuration = ARWorldTrackingConfiguration()
         
         guard let trackedImages = ARReferenceImage.referenceImages(inGroupNamed: "Scheme", bundle: nil)
-        else
+            else
         {
             print("No images available")
             return
@@ -129,21 +131,60 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             print("ARKit Scene Successfully Saved")
         }
     }
-
+    
     //
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         if editMode, let location = touches.first?.location(in: sceneView)
         {
-            if !isInteractiveObject(object: getTouchedObject(location: location))
+            let result = sceneView.hitTest(location, options: nil).first
+            
+            guard let node = result?.node
+            else
             {
-                print("edit mode off")
-                stopAllShakingObjects()
-                editMode = false
-                selectedObject = nil
-                originalScale = 0
-                originalColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 255/255)
+                disableEditMode()
+                return
+            }
+            
+            if node.categoryBitMask == 5
+            {
+                guard let i = removeGraphButtons.firstIndex(of: node) else {return}
+                
+                let relatedGraph = graphs[i]
+                
+                graphs.remove(at: i)
+                removeGraphButtons.remove(at: i)
+                
+                //node.removeFromParentNode()
+                //relatedGraph.removeFromParentNode()
+                
+                node.categoryBitMask = 6
+                relatedGraph.categoryBitMask = 6
+                
+                let duration : TimeInterval = 0.2
+                
+                let fadeAnimation = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
+                    
+                    let percentage = elapsedTime / CGFloat(duration)
+                    
+                    if percentage == 1
+                    {
+                        node.removeFromParentNode()
+                    }
+                    else
+                    {
+                        node.opacity = 1 * (1 - percentage)
+                    }
+                    
+                }
+                
+                node.runAction(fadeAnimation)
+                relatedGraph.runAction(fadeAnimation)
+            }
+            else if node.categoryBitMask != 4
+            {
+                disableEditMode()
             }
         }
     }
@@ -162,20 +203,22 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     @IBAction func panEvent(_ gestureRecognizer: UIPanGestureRecognizer)
     {
-        guard gestureRecognizer.view != nil, referencePlaneNode != nil else { return }
+        guard gestureRecognizer.view != nil, referencePlaneNode != nil, editMode, selectedObject != nil else { return }
         
         let location = gestureRecognizer.location(in: sceneView)
         let hitTestResult = sceneView.hitTest(location, options: nil).first
         
+        guard hitTestResult != nil else { return }
+        
         switch gestureRecognizer.state {
         case .began:
             //Controllo se c'è qualcosa da muovere
-            guard editMode, selectedObject != nil else { return }
-            lastPanLocation = hitTestResult!.worldCoordinates
+            lastPanLocation = hitTestResult?.worldCoordinates
             initialPanDepth = CGFloat(sceneView.projectPoint(lastPanLocation!).z)
             
+            break
+            
         case .changed:
-            guard editMode, selectedObject != nil else { return }
             
             let worldTouchPosition = sceneView.unprojectPoint(SCNVector3(location.x, location.y, initialPanDepth!))
             
@@ -184,17 +227,32 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 worldTouchPosition.y - lastPanLocation!.y,
                 0)
             
-            
-            if var finalPosition = selectedObject?.position
+            let i = graphs.firstIndex(of: selectedObject!)
+                
+            if var finalGraphPosition = selectedObject?.position, i != nil
             {
-                finalPosition.x = simd_clamp(movementVector.x + finalPosition.x, minBound.x, maxBound.x)
+                finalGraphPosition.x = simd_clamp(movementVector.x + finalGraphPosition.x, minBound.x, maxBound.x)
+                    
+                finalGraphPosition.y = simd_clamp(movementVector.y + finalGraphPosition.y, minBound.y, maxBound.y)
+                    
+                selectedObject?.position = finalGraphPosition
+                    
+                let i = graphs.firstIndex(of: selectedObject!)!
+                    
+                //fare calcolo meglio per movimento button
+                    
+                var finalRemoveGraphButtonPosition = removeGraphButtons[i].position
                 
-                finalPosition.y = simd_clamp(movementVector.y + finalPosition.y, minBound.y, maxBound.y)
-                
-                selectedObject?.position = finalPosition
+                finalRemoveGraphButtonPosition.x = simd_clamp(movementVector.x + finalRemoveGraphButtonPosition.x, minBound.x + buttonScale.x*2, maxBound.x + buttonScale.x*2)
+                    
+                finalRemoveGraphButtonPosition.y = simd_clamp(movementVector.y + finalRemoveGraphButtonPosition.y, minBound.y + buttonScale.y*2, maxBound.y + buttonScale.y*2)
+                    
+                removeGraphButtons[i].position = finalRemoveGraphButtonPosition
+                    
+                selectedObject?.position = finalGraphPosition
+                    
+                lastPanLocation = worldTouchPosition
             }
-            
-            self.lastPanLocation = worldTouchPosition
             
             break
         default:
@@ -208,20 +266,22 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         switch gestureRecognizer.state {
         case .began:
             let location = gestureRecognizer.location(in: sceneView)
-            let result = getTouchedObject(location: location)
-            if isInteractiveObject(object: result)
-            {
-                selectedObject = result?.node
-                highlightSelectedObject()
+            let result = sceneView.hitTest(location, options: [SCNHitTestOption.firstFoundOnly:true,SCNHitTestOption.categoryBitMask:4]).first
+            
+            guard result != nil else { return }
+            
+            selectedObject = result?.node
+            highlightSelectedObject()
                 
-                if !editMode
-                {
-                    print("edit mode on")
-                    editMode = true
-                    shakeAllObjects()
-                }
+            if !editMode
+            {
+                print("edit mode on")
+                editMode = true
+                shakeAllObjects()
             }
-
+            
+            break
+        case .changed:
             break
         case .ended:
             if selectedObject != nil
@@ -230,9 +290,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 hideSelectedObject()
                 selectedObject = nil
             }
-            break
-        case .changed:
-            print("changed")
             break
         case .failed:
             print("failed")
@@ -248,44 +305,73 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     //Utility functions
     
-    func getPlaneNormal() -> SCNVector3
+    func addGraph(viewController: MainViewController?, planeNode: SCNNode)
     {
-        let (min,max) = referencePlaneNode.boundingBox.self
-        
-        let normal = SCNVector3(x: max.y * min.z - max.z * min.y,
-                                y: max.z * min.x - max.x * min.z,
-                                z: max.x * min.y - max.y * min.x)
-        
-        print(normal)
-        
-        return normal
+        if let shipScene = SCNScene(named: "art.scnassets/ship.scn"), viewController != nil
+        {
+            let shipNode = shipScene.rootNode.childNodes.first!
+            
+            shipNode.position = SCNVector3(x: 0, y: 0, z: viewController!.distanceFromPlane)
+            
+            shipNode.categoryBitMask = 4
+            
+            planeNode.addChildNode(shipNode)
+            
+            let removeButtonPlane = SCNPlane(width: 1, height: 1)
+            
+            let removeButtonMaterial = SCNMaterial()
+            
+            removeButtonMaterial.diffuse.contents = UIImage(named: "removeIcon")
+            
+            removeButtonPlane.materials = [removeButtonMaterial]
+            
+            let removeButtonNode = SCNNode(geometry: removeButtonPlane)
+            
+            removeButtonNode.isHidden = true
+            
+            removeButtonNode.opacity = 0
+            
+            planeNode.addChildNode(removeButtonNode)
+            
+            removeButtonNode.scale = viewController!.buttonScale
+            
+            removeButtonNode.position = shipNode.position
+            
+            removeButtonNode.position.x += viewController!.buttonScale.x*2
+            
+            removeButtonNode.position.y += viewController!.buttonScale.y*2
+            
+            removeButtonNode.position.z += viewController!.buttonScale.z*2
+            
+            let billBoardCostraint = SCNBillboardConstraint()
+            
+            removeButtonNode.constraints = [billBoardCostraint]
+            
+            removeButtonNode.categoryBitMask = 5
+            
+            viewController?.graphs.append(shipNode)
+            
+            viewController?.removeGraphButtons.append(removeButtonNode)
+        }
     }
     
-    /*func calculateTranslation(hitTestResult: SCNHitTestResult) -> SCNVector3
+    func disableEditMode()
     {
-        /*var normalPlane = SCNVector4(0,0,1,0)
-        
-        let dotProd = normalPlane.x*movementVector.x + normalPlane.y*movementVector.y + normalPlane.z*movementVector.z
-        
-        normalPlane.x=normalPlane.x*dotProd
-        
-        normalPlane.y=normalPlane.y*dotProd
-        
-        normalPlane.z=normalPlane.z*dotProd
-        
-        let projection = SCNVector3(movementVector.x - normalPlane.x, movementVector.y - normalPlane.y, movementVector.z - normalPlane.z)*/
-        
-        /*let worldBottomLeft = referencePlaneNode.convertPosition(bottomLeft, to: referencePlaneNode.parent)
-        
-        let worldTopRight = referencePlaneNode.convertPosition(topRight, to: referencePlaneNode.parent)
-        
-        let worldBottomRight = referencePlaneNode.convertPosition(bottomRight, to: referencePlaneNode.parent)*/
-        
-        return movementVector
-    }*/
+        print("edit mode off")
+        stopAllShakingObjects()
+        editMode = false
+        selectedObject = nil
+        originalScale = 0
+        originalColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 255/255)
+        return
+    }
     
     func shakeAllObjects()
     {
+        var i = 0
+        
+        let appearRemoveButton = SCNAction.fadeOpacity(to: 1, duration: 0.2)
+        
         for graph in graphs
         {
             let a1 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.05)
@@ -294,16 +380,44 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             let a4 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.05)
             let sequence = SCNAction.sequence([a1,a2,a3,a4])
             let animation = SCNAction.repeatForever(sequence)
-            graph?.runAction(animation, forKey: "shake")
+            graph.runAction(animation, forKey: "shake")
+            
+            //mostro il suo remove button
+            removeGraphButtons[i].isHidden = false
+            removeGraphButtons[i].runAction(appearRemoveButton)
+            i=i+1
         }
     }
     
     func stopAllShakingObjects()
     {
+        var i = 0
+        
+        let duration: TimeInterval = 0.1
+        
+        let hideRemoveGraphButton = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
+            
+            let percentage = elapsedTime / CGFloat(duration)
+            
+            if percentage == 1
+            {
+                node.opacity = 0
+                node.isHidden=true
+            }
+            else
+            {
+                node.opacity = 1 * (1-percentage)
+            }
+            
+        }
+        
         for graph in graphs
         {
-            graph?.removeAction(forKey: "shake")
-            graph?.rotation = SCNVector4(x:0, y:0, z:0, w:1)
+            graph.removeAction(forKey: "shake")
+            graph.rotation = SCNVector4(x:0, y:0, z:0, w:1)
+            removeGraphButtons[i].removeAllActions()
+            removeGraphButtons[i].runAction(hideRemoveGraphButton)
+            i=i+1
         }
     }
     
@@ -319,11 +433,17 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         let duration: TimeInterval = 0.2
         
-        let colorAnimation = SCNAction.customAction(duration: duration, action: { (node, elapsedTime) in
+        let colorAnimation = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
             let percentage = elapsedTime / CGFloat(duration)
-            node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: currentColor, to: selectedColor, percentage: percentage)
-        })
-        
+            
+            let (fromRed, fromGreen, fromBlue, _) = currentColor.getComponents()
+            
+            let (toRed, toGreen, toBlue, _) = selectedColor.getComponents()
+            
+            let finalColor = UIColor(red: fromRed*(1-percentage)+toRed*percentage, green: fromGreen*(1-percentage)+toGreen*percentage, blue: fromBlue*(1-percentage)+toBlue*percentage, alpha: 255/255)
+            
+            node.geometry!.firstMaterial!.diffuse.contents = finalColor
+        }
         
         let scaleAnimation : SCNAction
         
@@ -332,6 +452,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         var finalScale = selectedObject?.scale.x ?? 1
         finalScale = finalScale * 1.25
         scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
+
         
         selectedObject?.runAction(colorAnimation)
         selectedObject?.runAction(scaleAnimation)
@@ -339,15 +460,21 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func hideSelectedObject()
     {
-        
         let currentColor =  selectedObject?.geometry?.materials.first?.diffuse.contents as! UIColor
-        
-        let duration: TimeInterval = 0.1
-        
-        let colorAnimation = SCNAction.customAction(duration: 0.2, action: { (node, elapsedTime) in
+            
+        let duration: TimeInterval = 0.2
+            
+        let colorAnimation = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
             let percentage = elapsedTime / CGFloat(duration)
-            node.geometry?.firstMaterial?.diffuse.contents = self.changeColor(from: currentColor, to: self.originalColor, percentage: percentage)
-        })
+                
+            let (fromRed, fromGreen, fromBlue, _) = currentColor.getComponents()
+                
+            let (toRed, toGreen, toBlue, _) = self.originalColor.getComponents()
+                
+            let finalColor = UIColor(red: fromRed*(1-percentage)+toRed*percentage, green: fromGreen*(1-percentage)+toGreen*percentage, blue: fromBlue*(1-percentage)+toBlue*percentage, alpha: 255/255)
+            
+            node.geometry!.firstMaterial!.diffuse.contents = finalColor
+        }
         
         let scaleAnimation : SCNAction
         
@@ -358,16 +485,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         selectedObject?.runAction(colorAnimation)
         selectedObject?.runAction(scaleAnimation)
     }
-    
-    func changeColor(from: UIColor, to: UIColor, percentage: CGFloat) -> UIColor {
-        let fromComponents = from.cgColor.components!
-        let toComponents = to.cgColor.components!
-        let color = UIColor(red: fromComponents[0] + (toComponents[0] - fromComponents[0]) * percentage,
-                            green: fromComponents[1] + (toComponents[1] - fromComponents[1]) * percentage,
-                            blue: fromComponents[2] + (toComponents[2] - fromComponents[2]) * percentage,
-                            alpha: toComponents[3])
-        return color
-    }
+
     
     func displayWhitePlane(imageAnchor: ARImageAnchor, node: SCNNode)
     {
@@ -375,7 +493,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             { [weak self] in
                 let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
                 
-                plane.firstMaterial?.diffuse.contents = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.8)
+                plane.firstMaterial?.diffuse.contents = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.6)
                 
                 let planeNode = SCNNode(geometry: plane)
                 
@@ -383,57 +501,26 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 node.addChildNode(planeNode)
                 
-                var (min, max) = planeNode.boundingBox
+                node.opacity = CGFloat(0)
                 
-                let size = SCNVector3Make(max.x - min.x, max.y - min.y, max.z - min.z)
+                node.categoryBitMask = 0
                 
-                let widthRatio = Float(imageAnchor.referenceImage.physicalSize.width)/size.x
-                let heightRatio = Float(imageAnchor.referenceImage.physicalSize.height)/size.z
-                // Pick smallest value to be sure that object fits into the image.
-                let finalRatio = [widthRatio, heightRatio].min()!
-                
-                let appearAnimation = SCNAction.scale(to: CGFloat(finalRatio), duration: 0.4)
-                
-                appearAnimation.timingMode = .easeOut
-                
-                planeNode.scale = SCNVector3(0.001, 0.001, 0.001)
-                
-                planeNode.runAction(appearAnimation)
+                let (min, max) = planeNode.boundingBox
                 
                 self?.minBound = min
                 
                 self?.maxBound = max
+            
+                let appearAnimation = SCNAction.fadeOpacity(to: 1.0, duration: 0.35)
                 
-                if let shipScene = SCNScene(named: "art.scnassets/ship.scn")
-                {
-                    let shipNode = shipScene.rootNode.childNodes.first
-                    shipNode?.position = SCNVector3(x: 0, y: 0, z: self!.distanceFromPlane)
-                    self?.graphs.append(shipNode)
-                    planeNode.addChildNode(shipNode!)
-                }
+                appearAnimation.timingMode = .easeOut
+                
+                self?.addGraph(viewController: self, planeNode: planeNode)
+                
+                node.runAction(appearAnimation)
                 
                 self?.referencePlaneNode = node
         }
-    }
-    
-    func isInteractiveObject(object: SCNHitTestResult?) -> Bool
-    {
-        guard object != nil else { return false }
-        guard let node = object?.node else { return false }
-        
-        if graphs.contains(node)
-        {
-            return true
-        }
-        
-        return false
-    }
-    
-    func getTouchedObject(location: CGPoint) -> SCNHitTestResult?
-    {
-        //let options = SCNHitTestOption(rawValue: SCNHitTestOption.firstFoundOnly.rawValue)
-        //return sceneView.hitTest(po)
-        return sceneView.hitTest(location, options: [SCNHitTestOption.firstFoundOnly:true]).first
     }
     
     func authorizeApp(){

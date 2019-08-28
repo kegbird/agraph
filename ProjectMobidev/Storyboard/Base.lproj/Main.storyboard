@@ -232,7 +232,7 @@
                                     <action selector="btnTakePhotoTouchDown:" destination="BV1-FR-VrT" eventType="touchUpInside" id="AN5-Q2-G37"/>
                                 </connections>
                             </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="crossAIr" translatesAutoresizingMaskIntoConstraints="NO" id="kMP-GG-eI0" userLabel="crossAir">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="crossAIrIcon" translatesAutoresizingMaskIntoConstraints="NO" id="kMP-GG-eI0" userLabel="crossAir">
                                 <rect key="frame" x="193.5" y="434.5" width="27" height="27"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No graph to place" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LHP-fp-l2m" userLabel="infoLabel">
@@ -315,7 +315,7 @@
                         <constraints>
                             <constraint firstItem="HNJ-df-jfm" firstAttribute="centerY" secondItem="rkq-xg-pd7" secondAttribute="centerY" id="FJw-Oh-y5n"/>
                             <constraint firstItem="HNJ-df-jfm" firstAttribute="centerX" secondItem="rkq-xg-pd7" secondAttribute="centerX" id="FMx-48-YBY"/>
-                            <constraint firstItem="HNJ-df-jfm" firstAttribute="top" secondItem="i2X-0w-veq" secondAttribute="bottom" constant="25" id="OV6-QV-ZXX"/>
+                            <constraint firstItem="HNJ-df-jfm" firstAttribute="top" secondItem="i2X-0w-veq" secondAttribute="bottom" constant="30" id="OV6-QV-ZXX"/>
                             <constraint firstItem="i2X-0w-veq" firstAttribute="centerX" secondItem="HNJ-df-jfm" secondAttribute="centerX" id="sn9-Ex-xhx"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="REY-Y1-php"/>
@@ -330,7 +330,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="crossAIr" width="27" height="27"/>
+        <image name="crossAIrIcon" width="27" height="27"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="du2-n2-l3g"/>
