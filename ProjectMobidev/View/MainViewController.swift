@@ -17,7 +17,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var editMode = false
     
-    var lastPanLocation : SCNVector3!
+    //var lastPanLocation : SCNVector3!
+    
+    var lastPanLocation : simd_float3!
     
     var selectedObject : SCNNode?
     
@@ -206,21 +208,24 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         guard gestureRecognizer.view != nil, referencePlaneNode != nil, editMode, selectedObject != nil else { return }
         
         let location = gestureRecognizer.location(in: sceneView)
-        let hitTestResult = sceneView.hitTest(location, options: nil).first
         
-        guard hitTestResult != nil else { return }
+        print(location)
         
         switch gestureRecognizer.state {
         case .began:
             //Controllo se c'è qualcosa da muovere
-            lastPanLocation = hitTestResult?.worldCoordinates
-            initialPanDepth = CGFloat(sceneView.projectPoint(lastPanLocation!).z)
+            
+            let hitTestResult = sceneView.hitTest(location, options: nil).first
+            
+            guard hitTestResult != nil else { return }
+            //lastPanLocation = hitTestResult?.worldCoordinates
+            //initialPanDepth = CGFloat(sceneView.projectPoint(lastPanLocation!).z)
+            lastPanLocation = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(referencePlaneNode.transform))
             
             break
             
         case .changed:
-            
-            let worldTouchPosition = sceneView.unprojectPoint(SCNVector3(location.x, location.y, initialPanDepth!))
+            guard var worldTouchPosition = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(referencePlaneNode.transform)) else { return }
             
             let movementVector = SCNVector3(
                 worldTouchPosition.x - lastPanLocation!.x,
@@ -234,10 +239,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 finalGraphPosition.x = simd_clamp(movementVector.x + finalGraphPosition.x, minBound.x, maxBound.x)
                     
                 finalGraphPosition.y = simd_clamp(movementVector.y + finalGraphPosition.y, minBound.y, maxBound.y)
-                    
-                selectedObject?.position = finalGraphPosition
-                    
+                
                 let i = graphs.firstIndex(of: selectedObject!)!
+                
+                selectedObject?.position = finalGraphPosition
                     
                 //fare calcolo meglio per movimento button
                     
@@ -248,9 +253,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 finalRemoveGraphButtonPosition.y = simd_clamp(movementVector.y + finalRemoveGraphButtonPosition.y, minBound.y + buttonScale.y*2, maxBound.y + buttonScale.y*2)
                     
                 removeGraphButtons[i].position = finalRemoveGraphButtonPosition
-                    
-                selectedObject?.position = finalGraphPosition
-                    
+    
                 lastPanLocation = worldTouchPosition
             }
             
