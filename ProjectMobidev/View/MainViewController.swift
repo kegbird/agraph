@@ -17,10 +17,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var editMode = false
     
-    //var lastPanLocation : SCNVector3!
-    
-    var lastPanLocation : simd_float3!
-    
     var selectedObject : SCNNode?
     
     var originalScale = Float(0)
@@ -31,13 +27,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var removeGraphButtons : [SCNNode] = []
     
-    var initialPanDepth : CGFloat?
-    
     var referencePlaneNode : SCNNode!
-    
-    var minBound = SCNVector3(x:0, y:0, z:0)
-    
-    var maxBound = SCNVector3(x:0, y:0, z:0)
     
     let distanceFromPlane : Float = 0.15
     
@@ -209,8 +199,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         let location = gestureRecognizer.location(in: sceneView)
         
-        print(location)
-        
         switch gestureRecognizer.state {
         case .began:
             //Controllo se c'è qualcosa da muovere
@@ -218,44 +206,31 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             let hitTestResult = sceneView.hitTest(location, options: nil).first
             
             guard hitTestResult != nil else { return }
-            //lastPanLocation = hitTestResult?.worldCoordinates
-            //initialPanDepth = CGFloat(sceneView.projectPoint(lastPanLocation!).z)
-            lastPanLocation = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(referencePlaneNode.transform))
+            
+            let projectedPoint = selectedObject?.convertPosition(getProjectedPoint(location: location), to: selectedObject)
+            
+            selectedObject?.worldPosition = projectedPoint!
             
             break
             
         case .changed:
-            guard var worldTouchPosition = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(referencePlaneNode.transform)) else { return }
             
-            let movementVector = SCNVector3(
-                worldTouchPosition.x - lastPanLocation!.x,
-                worldTouchPosition.y - lastPanLocation!.y,
-                0)
+            selectedObject?.worldPosition = getProjectedPoint(location: location)
+            
+            //aggiusto la profondità
+            selectedObject?.position.z = distanceFromPlane
             
             let i = graphs.firstIndex(of: selectedObject!)
+            
+            var finalRemoveGraphButtonWorldPosition = selectedObject?.worldPosition
+                    
+            finalRemoveGraphButtonWorldPosition!.x += buttonScale.x*3
                 
-            if var finalGraphPosition = selectedObject?.position, i != nil
-            {
-                finalGraphPosition.x = simd_clamp(movementVector.x + finalGraphPosition.x, minBound.x, maxBound.x)
-                    
-                finalGraphPosition.y = simd_clamp(movementVector.y + finalGraphPosition.y, minBound.y, maxBound.y)
+            finalRemoveGraphButtonWorldPosition!.y += buttonScale.x*3
                 
-                let i = graphs.firstIndex(of: selectedObject!)!
+            finalRemoveGraphButtonWorldPosition?.z += buttonScale.x*3
                 
-                selectedObject?.position = finalGraphPosition
-                    
-                //fare calcolo meglio per movimento button
-                    
-                var finalRemoveGraphButtonPosition = removeGraphButtons[i].position
-                
-                finalRemoveGraphButtonPosition.x = simd_clamp(movementVector.x + finalRemoveGraphButtonPosition.x, minBound.x + buttonScale.x*2, maxBound.x + buttonScale.x*2)
-                    
-                finalRemoveGraphButtonPosition.y = simd_clamp(movementVector.y + finalRemoveGraphButtonPosition.y, minBound.y + buttonScale.y*2, maxBound.y + buttonScale.y*2)
-                    
-                removeGraphButtons[i].position = finalRemoveGraphButtonPosition
-    
-                lastPanLocation = worldTouchPosition
-            }
+            removeGraphButtons[i!].worldPosition = finalRemoveGraphButtonWorldPosition!
             
             break
         default:
@@ -338,13 +313,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             removeButtonNode.scale = viewController!.buttonScale
             
-            removeButtonNode.position = shipNode.position
+            removeButtonNode.worldPosition = shipNode.worldPosition
             
-            removeButtonNode.position.x += viewController!.buttonScale.x*2
+            removeButtonNode.worldPosition.x += viewController!.buttonScale.x*3
             
-            removeButtonNode.position.y += viewController!.buttonScale.y*2
+            removeButtonNode.worldPosition.y += viewController!.buttonScale.y*3
             
-            removeButtonNode.position.z += viewController!.buttonScale.z*2
+            removeButtonNode.worldPosition.z += viewController!.buttonScale.z*3
             
             let billBoardCostraint = SCNBillboardConstraint()
             
@@ -367,6 +342,60 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         originalScale = 0
         originalColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 255/255)
         return
+    }
+    
+    func getProjectedPoint(location: CGPoint) -> SCNVector3
+    {
+        guard var projectedPoint = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(referencePlaneNode.transform)) else {
+            return SCNVector3(x: 0, y: 0, z:0)
+        }
+        
+        let referencePlaneTransform = simd_float4x4(referencePlaneNode.worldTransform)
+        
+        let (_,normal,_,_) = referencePlaneTransform.columns
+        
+        //proietto il punto sul piano movimento
+        projectedPoint.x += normal.x * distanceFromPlane
+        projectedPoint.y += normal.y * distanceFromPlane
+        projectedPoint.z += normal.z * distanceFromPlane
+        
+        let plane = referencePlaneNode.childNodes.first!.geometry as! SCNPlane
+        
+        //calcolo min max tramite vettori del piano
+        
+        var worldMax = referencePlaneNode.worldPosition
+        var worldMin = referencePlaneNode.worldPosition
+        
+        worldMax.x += referencePlaneNode.worldRight.x * Float(plane.width/2)
+        worldMax.y += referencePlaneNode.worldRight.y * Float(plane.width/2)
+        worldMax.z += referencePlaneNode.worldRight.z * Float(plane.width/2)
+        
+        worldMax.x += referencePlaneNode.worldFront.x * Float(plane.width/2)
+        worldMax.y += referencePlaneNode.worldFront.y * Float(plane.width/2)
+        worldMax.z += referencePlaneNode.worldFront.z * Float(plane.width/2)
+        
+        worldMin.x -= referencePlaneNode.worldRight.x * Float(plane.width/2)
+        worldMin.y -= referencePlaneNode.worldRight.y * Float(plane.width/2)
+        worldMin.z -= referencePlaneNode.worldRight.z * Float(plane.width/2)
+        
+        worldMin.x -= referencePlaneNode.worldFront.x * Float(plane.width/2)
+        worldMin.y -= referencePlaneNode.worldFront.y * Float(plane.width/2)
+        worldMin.z -= referencePlaneNode.worldFront.z * Float(plane.width/2)
+        
+        worldMax.x += normal.x * distanceFromPlane
+        worldMax.y += normal.y * distanceFromPlane
+        worldMax.z += normal.z * distanceFromPlane
+        
+        worldMin.x += normal.x * distanceFromPlane
+        worldMin.y += normal.y * distanceFromPlane
+        worldMin.z += normal.z * distanceFromPlane
+        
+        //clamp
+        projectedPoint.x = simd_clamp(projectedPoint.x, worldMin.x, worldMax.x)
+        
+        projectedPoint.y = simd_clamp(projectedPoint.y, worldMin.y, worldMax.y)
+    
+        return SCNVector3(projectedPoint)
     }
     
     func shakeAllObjects()
@@ -489,7 +518,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         selectedObject?.runAction(scaleAnimation)
     }
 
-    
     func displayWhitePlane(imageAnchor: ARImageAnchor, node: SCNNode)
     {
         DispatchQueue.main.async
@@ -508,12 +536,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 node.categoryBitMask = 0
                 
-                let (min, max) = planeNode.boundingBox
-                
-                self?.minBound = min
-                
-                self?.maxBound = max
-            
                 let appearAnimation = SCNAction.fadeOpacity(to: 1.0, duration: 0.35)
                 
                 appearAnimation.timingMode = .easeOut
