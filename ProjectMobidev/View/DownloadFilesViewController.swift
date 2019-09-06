@@ -23,6 +23,14 @@ class DownloadFilesViewController: UIViewController {
         downloadFiles()
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toMainViewController"
+        {
+            let destination = segue.destination as! MainViewController
+            destination.graphsToBePlaced = sender as! [String]
+        }
+    }
+    
     func downloadFiles()
     {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
