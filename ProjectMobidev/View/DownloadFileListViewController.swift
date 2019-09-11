@@ -9,23 +9,36 @@
 import UIKit
 import SwiftyDropbox
 
+protocol DisplayFileList
+{
+    func displayDownloadedFileList(files : [Files.Metadata])
+}
+
 class DownloadFileListViewController: UIViewController {
     
     @IBOutlet weak var infoLabel: UILabel!
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
+    var implementer : DisplayFileList?
+    
+    override var prefersStatusBarHidden: Bool
+    {
+        return true
+    }
+    
     override func viewDidLoad() {
         downloadFileList()
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if segue.identifier == "toFilesTableViewController"
-        {
-            let destination = segue.destination as! FilesViewController
-            destination.files = sender as! [Files.Metadata]
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     func downloadFileList()
@@ -47,7 +60,10 @@ class DownloadFileListViewController: UIViewController {
                             files.append(file)
                         }
                         
-                        self?.performSegue(withIdentifier: "toFilesTableViewController", sender: files)
+                        self?.dismiss(animated: true, completion: (
+                            { [weak self] in
+                                self?.implementer?.displayDownloadedFileList(files: files)
+                            }))
                     }
                 }
                 else if let error = error
@@ -86,7 +102,7 @@ class DownloadFileListViewController: UIViewController {
             { [weak self] in
                 self?.activityIndicator.stopAnimating()
                 
-                    Alert.DisplayPopUp(viewController: self, title: "Error", message: message, style: .destructive)
+                    Alert.DisplayPopUpAndDismiss(viewController: self, title: "Error", message: message, style: .destructive)
         }
     }
 }

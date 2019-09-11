@@ -9,11 +9,14 @@
 import UIKit
 import SwiftyDropbox
 
-class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
+class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ReturnToRoot{
     
     @IBOutlet weak var table: UITableView!
 
-    @IBOutlet weak var btnDone: UIBarButtonItem!
+    override var prefersStatusBarHidden: Bool
+    {
+        return true
+    }
     
     var files:[Files.Metadata]=[]
     
@@ -37,8 +40,16 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 
                 let destination = segue.destination as! DownloadFilesViewController
                 destination.filesToDownload = filesPath
-                
-                print(filesPath)
+                    destination.implementer = self
+            }
+        }
+        else if segue.identifier == "returnToRoot"
+        {
+            let destination = segue.destination as! MainViewController
+            
+            if ((sender as? [String]) != nil)
+            {
+                destination.graphToCreate = sender as! [String]
             }
         }
     }
@@ -64,7 +75,7 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
     {
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-        btnDone.isEnabled = true
+        navigationItem.rightBarButtonItem?.isEnabled = true
     }
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath)
@@ -76,21 +87,23 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func setUp()
     {
-        btnDone.isEnabled=false
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(btnDoneTouchDown))
+        navigationItem.rightBarButtonItem?.isEnabled = false
         table.allowsMultipleSelection = true
         table.reloadData()
     }
     
     //Event functions
     
-    @IBAction func btnBackTouchDown(_ sender: Any)
-    {
-        performSegue(withIdentifier: "toMainViewController", sender: nil)
-    }
-    
-    @IBAction func btnDoneTouchDown(_ sender: Any)
+    @objc func btnDoneTouchDown()
     {
         performSegue(withIdentifier: "toDownloadFilesViewController", sender: nil)
+    }
+    
+    //Protocol stub
+    
+    func ReturnToRootViewController(filesContent : [String]) {
+        performSegue(withIdentifier: "returnToRoot", sender: filesContent)
     }
 
 }

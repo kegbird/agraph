@@ -8,6 +8,11 @@
 
 import UIKit
 
+protocol ReturnToRoot
+{
+    func ReturnToRootViewController(filesContent : [String])
+}
+
 class DownloadFilesViewController: UIViewController {
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -16,19 +21,18 @@ class DownloadFilesViewController: UIViewController {
     
     var filesContents : [String]=[]
     
+    var implementer : ReturnToRoot!
+    
     var fail = false
 
+    override var prefersStatusBarHidden: Bool
+    {
+        return true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         downloadFiles()
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "toMainViewController"
-        {
-            let destination = segue.destination as! MainViewController
-            destination.graphsToBePlaced = sender as! [String]
-        }
     }
     
     func downloadFiles()
@@ -64,45 +68,39 @@ class DownloadFilesViewController: UIViewController {
                         
                         if self?.filesContents.count == self?.filesToDownload.count
                         {
-                            self?.performSegue(withIdentifier: "toMainViewController", sender: nil)
+                            self?.implementer.ReturnToRootViewController(filesContent: self!.filesContents)
+                            self?.dismiss(animated: true, completion: nil)
+                            
+                            
                         }
                     }
+                    
                     group.leave()
                 }
                 else
                 {
-                    print("marcio")
                     DispatchQueue.main.async { [weak self] in
                         let message = "The file "+path+" is not a valid .csv"
                         
-                        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+                        Alert.DisplayPopUpAndDismiss(viewController: self, title: "Error", message: message, style: .destructive)
                         
-                        
-                        alert.addAction(UIAlertAction(title: "Ok", style: .destructive, handler: { (action) in
-                            self?.dismiss(animated: true, completion: nil)
-                        }))
-                        
-                        self?.present(alert, animated: true, completion: nil)
                         self?.fail = true
-                        group.leave()
                     }
+                    
+                    group.leave()
                 }
             }
             else if error != nil
             {
-                print("errore")
                 DispatchQueue.main.async { [weak self] in
-                    let alert = UIAlertController(title: "Error", message: "An error occured during the download of a file", preferredStyle: .alert)
+                    let message = "An error occured during the download of a file"
                     
+                    Alert.DisplayPopUpAndDismiss(viewController: self, title: "Error", message: message, style: .destructive)
                     
-                    alert.addAction(UIAlertAction(title: "Ok", style: .destructive, handler: { (action) in
-                        self?.dismiss(animated: true, completion: nil)
-                    }))
-                    
-                    self?.present(alert, animated: true, completion: nil)
                     self?.fail = true
-                    group.leave()
                 }
+                
+                group.leave()
             }
         }
     }
