@@ -11,12 +11,9 @@ enum InfoUpdate {
     case NothingToDo
     case AimToThePlane
     case TapToPlace
-    case PlaneNotFound
-    case PlaneFound
     case GraphToPlace
     case GraphRemoved
     case AllGraphPlaced
     case EditModeOn
     case EditModeOff
-    case NoGraphToPlace
 }

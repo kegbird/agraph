@@ -21,19 +21,17 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var currentMode : WorkingMode = .watchingMode
     
+    let messageToPrint = OperationQueue()
+    
     var lastAdjustment = Double(0.0)
     
     var updateFrequency = Double(0.25)
     
     var lastPanLocation = SCNVector3(x: 0, y:0, z:0)
     
-    var selectedObject : SCNNode?
+    var selectedObject : Graph!
     
-    var selectedObjectRemoveButton : SCNNode?
-    
-    var objectToBePlaced : SCNNode!
-    
-    var objectToBePlacedRemoveButton : SCNNode!
+    var graphToBePlaced : Graph!
     
     var originalScale = Float(0)
     
@@ -46,6 +44,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     var aimOnThePlane : Bool = false
     
     var placeTheGraph : Bool = false
+    
+    var labelModifyCount : Int = 0
     
     var graphs : [Graph] = []
     
@@ -78,9 +78,15 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         {
             currentMode = .watchingMode
             updateInfoLabel(infoType: .NothingToDo)
+            labelModifyCount += 1
+            let copy = labelModifyCount
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 [weak self] in
-                self?.updateInfoLabel(infoType: .TapOnAddAdvice)
+                if copy == self?.labelModifyCount
+                {
+                    self?.updateInfoLabel(infoType: .TapOnAddAdvice)
+                    self?.labelModifyCount = 0
+                }
             }
         }
     }
@@ -103,6 +109,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         sceneView.scene = scene
         
         middleScreen = self.view.center
+        
+        messageToPrint.maxConcurrentOperationCount = 1
+        
+        messageToPrint.qualityOfService = .userInteractive
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -180,9 +190,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             if placeTheGraph
             {
-                objectToBePlaced.geometry?.firstMaterial!.multiply.contents = originalColor
-                objectToBePlaced = nil
-                objectToBePlacedRemoveButton = nil
+                guard graphToBePlaced != nil else { return }
+                graphToBePlaced.setGraphColor(color: UIColor.white)
+                graphToBePlaced = nil
                 
                 DispatchQueue.main.async
                     { [weak self] in
@@ -192,11 +202,19 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                         if self?.graphToCreate.count == 0
                         {
                             self?.currentMode = .watchingMode
+                            
+                            self?.labelModifyCount += 1
+                            let copy = self?.labelModifyCount
+                            
                             self?.updateInfoLabel(infoType: .AllGraphPlaced)
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                 [weak self] in
-                                self?.updateInfoLabel(infoType: .NothingToDo)
+                                if copy == self?.labelModifyCount
+                                {
+                                    self?.updateInfoLabel(infoType: .NothingToDo)
+                                    self?.labelModifyCount = 0
+                                }
                             }
                         }
                 }
@@ -269,18 +287,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             let result = sceneView.hitTest(location, options: nil).first
             
             guard let node = result?.node
-            else
-            {
-                updateInfoLabel(infoType: .EditModeOff)
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    [weak self] in
-                    self?.updateInfoLabel(infoType: .NothingToDo)
-                }
-                
-                disableEditMode()
-                return
-            }
+            else { return }
             
             if node.categoryBitMask == 5
             {
@@ -314,6 +321,19 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 removedGraph.getNode().runAction(fadeAnimation)
                 removedGraph.getRemoveButtonNode().runAction(fadeAnimation)
+                
+                updateInfoLabel(infoType: .GraphRemoved)
+                labelModifyCount += 1
+                let copy = labelModifyCount
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    [weak self] in
+                    if copy == self?.labelModifyCount
+                    {
+                        self?.updateInfoLabel(infoType: .NothingToDo)
+                        self?.labelModifyCount = 0
+                    }
+                }
             }
             else if node.categoryBitMask != 4
             {
@@ -363,18 +383,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             movementVector.z -= lastPanLocation.z
             
-            var finalPosition = selectedObject!.worldPosition
+            var finalPosition = selectedObject.getGraphWorldPosition()
             
             finalPosition.x += movementVector.x
             
             finalPosition.z += movementVector.z
             
-            selectedObject?.worldPosition = finalPosition
-            
-            //aggiusto la profondità
-            selectedObject?.position.z = distanceFromPlane
-            
-            selectedObjectRemoveButton!.worldPosition =  (selectedObject?.convertPosition((selectedObject?.boundingBox.max)!, to: sceneView.scene.rootNode))!
+            selectedObject.setGraphWorldPosition(worldPosition: finalPosition, distanceFromPlane: distanceFromPlane, scene: sceneView)
             
             lastPanLocation = currentPanLocation
 
@@ -396,15 +411,28 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             guard result != nil else { return }
             
-            selectedObject = result?.node
+            selectedObject = getGraphObject(node: result?.node)
             highlightSelectedObject()
-            let i = getGraphIndex(graph: selectedObject!)
-            selectedObjectRemoveButton = graphs[i].getRemoveButtonNode()
                 
             if currentMode == .watchingMode
             {
-                updateInfoLabel(infoType: .EditModeOn)
                 currentMode = .editMode
+                
+                updateInfoLabel(infoType: .EditModeOn)
+                
+                labelModifyCount += 1
+                let copy = labelModifyCount
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    [weak self] in
+                    
+                    if copy == self?.labelModifyCount
+                    {
+                        self?.updateInfoLabel(infoType: .NothingToDo)
+                        self?.labelModifyCount = 0
+                    }
+                }
+                
                 shakeAllObjects()
             }
             
@@ -492,11 +520,26 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func disableEditMode()
     {
+        updateInfoLabel(infoType: .EditModeOff)
+        
+        labelModifyCount += 1
+        
+        let copy = labelModifyCount
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            [weak self] in
+            
+            if copy == self?.labelModifyCount
+            {
+                self?.updateInfoLabel(infoType: .NothingToDo)
+                self?.labelModifyCount = 0
+            }
+        }
+        
         print("edit mode off")
         stopAllShakingObjects()
         currentMode = .watchingMode
         selectedObject = nil
-        selectedObjectRemoveButton = nil
         originalScale = 0
         originalColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 255/255)
         return
@@ -504,16 +547,19 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func getProjectedPoint(location: CGPoint) -> SCNVector3
     {
-        guard var projectedPoint = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(sceneView.scene.rootNode.transform)) else {
-            return SCNVector3(x: 0, y: 0, z:0)
+        var projectedPoint = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(sceneView.scene.rootNode.transform))
+        
+        if projectedPoint == nil
+        {
+            projectedPoint = simd_float3(planeNode.worldPosition)
         }
         
         let normal = getReferencePlaneNormal()
         
         //proietto il punto sul piano movimento
-        projectedPoint.x += normal.x * distanceFromPlane
-        projectedPoint.y += normal.y * distanceFromPlane
-        projectedPoint.z += normal.z * distanceFromPlane
+        projectedPoint!.x += normal.x * distanceFromPlane
+        projectedPoint!.y += normal.y * distanceFromPlane
+        projectedPoint!.z += normal.z * distanceFromPlane
         
         //calcolo min max tramite vettori del piano
         var (worldMin, worldMax) = getMinMaxWorldCoordinates()
@@ -527,10 +573,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         worldMin.z += normal.z * distanceFromPlane
         
         //clamp
-        projectedPoint.x = simd_clamp(projectedPoint.x, worldMin.x, worldMax.x)
-        projectedPoint.z = simd_clamp(projectedPoint.z, -worldMin.z, -worldMax.z)
+        projectedPoint!.x = simd_clamp(projectedPoint!.x, worldMin.x, worldMax.x)
+        projectedPoint!.z = simd_clamp(projectedPoint!.z, -worldMin.z, -worldMax.z)
     
-        return SCNVector3(projectedPoint)
+        return SCNVector3(projectedPoint!)
     }
     
     func CheckIfPointOverReferencePlane(projectedPoint: SCNVector3) -> Bool
@@ -618,7 +664,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     {
         guard selectedObject != nil else { return }
         
-        let currentColor = selectedObject?.geometry?.materials.first?.multiply.contents as! UIColor
+        let currentColor = selectedObject.getGraphCurrentColor()
         
         originalColor = currentColor
         
@@ -638,20 +684,19 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         let scaleAnimation : SCNAction
         
-        originalScale = Float(selectedObject?.scale.x ?? 1)
+        originalScale = Float(selectedObject.getGraphScale().x)
         
-        var finalScale = selectedObject?.scale.x ?? 1
+        var finalScale = selectedObject.getGraphScale().x
         finalScale = finalScale * 1.25
         scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
         
-        selectedObject?.runAction(colorAnimation)
-        selectedObject?.runAction(scaleAnimation)
+        selectedObject.runActionOnGraph(action: colorAnimation)
+        selectedObject.runActionOnGraph(action: scaleAnimation)
     }
     
     func hideSelectedObject()
     {
-        let currentColor =  selectedObject?.geometry?.materials.first?.multiply.contents as! UIColor
-            
+        let currentColor = selectedObject.getGraphCurrentColor()
         let duration: TimeInterval = 0.2
             
         let colorAnimation = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
@@ -672,8 +717,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
         
-        selectedObject?.runAction(colorAnimation)
-        selectedObject?.runAction(scaleAnimation)
+        selectedObject.runActionOnGraph(action: colorAnimation)
+        selectedObject.runActionOnGraph(action: scaleAnimation)
     }
     
     func adjustCoordinateSystem()
@@ -696,13 +741,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 node.addChildNode(planeNode)
                 
-                node.opacity = CGFloat(1)
-                
                 node.categoryBitMask = 0
-                
-                let appearAnimation = SCNAction.fadeOpacity(to: 1.0, duration: 0.35)
-                
-                appearAnimation.timingMode = .easeOut
                 
                 self?.planeNode = planeNode
                 
@@ -713,8 +752,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                     planeNode.addChildNode(graph.getNode())
                     planeNode.addChildNode(graph.getRemoveButtonNode())
                 }
-                
-                node.runAction(appearAnimation)
         }
     }
     
@@ -795,17 +832,28 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func displayGraphPreview(worldPosition: SCNVector3)
     {
-        if objectToBePlaced == nil
+        if graphToBePlaced == nil
         {
-            let temp = addGraph(worldPosition: worldPosition)
-            objectToBePlaced = temp?.getNode()
-            objectToBePlacedRemoveButton = temp?.getRemoveButtonNode()
+            graphToBePlaced = addGraph(worldPosition: worldPosition)
         }
         else
         {
-            objectToBePlaced.worldPosition = worldPosition
-            objectToBePlacedRemoveButton.worldPosition =  (objectToBePlaced?.convertPosition((objectToBePlaced?.boundingBox.max)!, to: sceneView.scene.rootNode))!
+            graphToBePlaced.setGraphWorldPosition(worldPosition: worldPosition, distanceFromPlane: distanceFromPlane, scene: sceneView)
         }
+    }
+    
+    func getGraphObject(node: SCNNode?) -> Graph?
+    {
+        guard node != nil else { return nil }
+        for g in graphs
+        {
+            if g.getNode() == node
+            {
+                return g
+            }
+        }
+        
+        return nil
     }
     
     func updateInfoLabel(infoType : InfoUpdate)
@@ -823,23 +871,17 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         case .NothingToDo:
             infoLabel.text = ""
             break
-        case .PlaneFound:
-            infoLabel.text = "Plane found!"
-            break
-        case .NoGraphToPlace:
-            infoLabel.text = "No graphs to be added"
-            break
-        case .PlaneNotFound:
-            infoLabel.text = "Focus on the marker"
-            break
         case .AimToThePlane:
-            infoLabel.text = "Aim to the dark plane"
+            infoLabel.text = "Aim to the marker"
             break
         case .TapToPlace:
             infoLabel.text = "Tap to place a graph"
             break
         case .AllGraphPlaced:
             infoLabel.text = "All graph have been placed"
+            break
+        case .GraphRemoved:
+            infoLabel.text = "Graph removed"
             break
         default:
             break
