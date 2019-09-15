@@ -11,5 +11,11 @@ import ARKit
 
 class Point
 {
+    var position : SCNVector3
+    var color : UIColor
     
+    init(position : SCNVector3, color : UIColor) {
+        self.position = position
+        self.color = color
+    }
 }

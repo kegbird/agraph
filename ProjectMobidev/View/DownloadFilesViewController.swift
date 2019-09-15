@@ -69,6 +69,7 @@ class DownloadFilesViewController: UIViewController {
                         if self?.filesContents.count == self?.filesToDownload.count
                         {
                             self?.implementer.ReturnToRootViewController(filesContent: self!.filesContents)
+                            
                             self?.dismiss(animated: true, completion: nil)
                             
                             

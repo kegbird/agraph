@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ARKit
 import SwiftyDropbox
 
 class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ReturnToRoot{
@@ -47,9 +48,46 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
         {
             let destination = segue.destination as! MainViewController
             
-            if ((sender as? [String]) != nil)
+            if let files = sender as? [String]
             {
-                destination.graphToCreate = sender as! [String]
+                var graphToCreate : [Graph] = []
+                
+                for file in files
+                {
+                    var data = file.components(separatedBy: .newlines)
+                    
+                    let title = data.first ?? ""
+                    
+                    var points : [Point] = []
+                    
+                    data.removeFirst()
+                    
+                    data.removeAll(where: {$0 == ""})
+                    
+                    for line in data
+                    {
+                        let values = line.components(separatedBy: ";")
+                        
+                        let x = Float(values[0]) as Float?
+                        let y = Float(values[1]) as Float?
+                        let z = Float(values[2]) as Float?
+                        
+                        let position = SCNVector3(x: x!, y: y!, z: z!)
+                        
+                        let r = Int(values[3])!/255
+                        let g = Int(values[4])!/255
+                        let b = Int(values[5])!/255
+                        
+                        let color = UIColor(red: CGFloat(r), green: CGFloat(g), blue: CGFloat(b), alpha: CGFloat(1))
+                        
+                        let point = Point(position: position, color: color)
+                        
+                        points.append(point)
+                    }
+                    
+                    graphToCreate.append(Graph(title: title, points: points))
+                }
+                destination.graphToCreate = graphToCreate
             }
         }
     }
@@ -89,6 +127,9 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
     {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(btnDoneTouchDown))
         navigationItem.rightBarButtonItem?.isEnabled = false
+        
+        navigationItem.title = "Choose graphs to plot"
+        
         table.allowsMultipleSelection = true
         table.reloadData()
     }

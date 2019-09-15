@@ -15,8 +15,10 @@ struct CsvChecker
         if let content = fileContent
         {
             var data = content.components(separatedBy: .newlines)
-            data.remove(at: 0)
-            data.remove(at: data.count-1)
+            
+            data.removeFirst()
+            
+            data.removeAll(where: {$0 == ""})
             
             for line in data
             {
@@ -41,6 +43,11 @@ struct CsvChecker
         }
         
         if Float(line[0]) == nil || Float(line[1]) == nil || Float(line[2]) == nil || Int(line[3]) == nil || Int(line[4]) == nil || Int(line[5]) == nil
+        {
+            return false
+        }
+        
+        if Int(line[3])!>255 || Int(line[4])!>255 || Int(line[5])!>255
         {
             return false
         }

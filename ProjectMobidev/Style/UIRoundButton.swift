@@ -28,6 +28,11 @@ class UIRoundButton: UIButton
         }
     }
     
+    func innerCirclePath () -> UIBezierPath
+    {
+        return UIBezierPath(roundedRect: CGRect(x:8, y:8, width:50, height:50), cornerRadius: 25)
+    }
+    
     @IBInspectable var borderColor: UIColor = UIColor.clear
         {
         didSet

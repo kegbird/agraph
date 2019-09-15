@@ -11,21 +11,90 @@ import ARKit
 
 class Graph
 {
+    var title : String
+    
     var node : SCNNode!
     
     var relatedRemoveButtonNode : SCNNode!
     
-    var points : [Point]!
+    var points : [Point] = []
     
-    init(content:String, node: SCNNode, relatedRemoveButtonNode: SCNNode) {
-
+    init(title: String, points : [Point]) {
+        
+        self.title = title
+        self.points = points
+        
+        //normalizzo i dati
+        if points.count > 0
+        {
+            var maxX = points.first?.position.x
+            var maxY = points.first?.position.y
+            var maxZ = points.first?.position.z
+            
+            var minX = points.first?.position.x
+            var minY = points.first?.position.y
+            var minZ = points.first?.position.z
+            
+            for point in points
+            {
+                if maxX! < point.position.x
+                {
+                    maxX = point.position.x
+                }
+                
+                if maxY! < point.position.y
+                {
+                    maxY = point.position.y
+                }
+                
+                if maxZ! < point.position.z
+                {
+                    maxZ = point.position.z
+                }
+                
+                if minX! > point.position.x
+                {
+                    minX = point.position.x
+                }
+                
+                if minY! > point.position.y
+                {
+                    minY = point.position.y
+                }
+                
+                if minZ! > point.position.z
+                {
+                    minZ! = point.position.z
+                }
+            }
+            
+            for point in points
+            {
+                point.position.x = (point.position.x - minX!) / (maxX! - minX!)
+                point.position.y = (point.position.y - minY!) / (maxY! - minY!)
+                point.position.z = (point.position.z - minZ!) / (maxZ! - minZ!)
+            }
+        }
+    }
+    
+    func setNode(node: SCNNode)
+    {
         self.node = node
-        self.relatedRemoveButtonNode = relatedRemoveButtonNode
+    }
+    
+    func getPoints() -> [Point]
+    {
+        return points
     }
     
     func getNode() -> SCNNode
     {
         return node
+    }
+    
+    func setRemoveButtonNode(relatedRemoveButtonNode: SCNNode)
+    {
+        self.relatedRemoveButtonNode = relatedRemoveButtonNode
     }
     
     func getRemoveButtonNode() -> SCNNode

@@ -21,8 +21,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var currentMode : WorkingMode = .watchingMode
     
-    let messageToPrint = OperationQueue()
-    
     var lastAdjustment = Double(0.0)
     
     var updateFrequency = Double(0.25)
@@ -48,6 +46,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     var labelModifyCount : Int = 0
     
     var graphs : [Graph] = []
+
+    var graphToCreate : [Graph] = []
     
     var planeRoot : SCNNode!
     
@@ -57,9 +57,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     let graphScale : Float = 0.15
     
-    let buttonScale : Float = 0.045
-    
-    var graphToCreate : [String] = []
+    let buttonScale : Float = 0.065
     
     var middleScreen : CGPoint?
     
@@ -109,10 +107,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         sceneView.scene = scene
         
         middleScreen = self.view.center
-        
-        messageToPrint.maxConcurrentOperationCount = 1
-        
-        messageToPrint.qualityOfService = .userInteractive
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -197,7 +191,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 DispatchQueue.main.async
                     { [weak self] in
                         self?.placeTheGraph = false
-                        self?.graphToCreate.removeFirst()
                         
                         if self?.graphToCreate.count == 0
                         {
@@ -500,6 +493,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             let billBoardCostraint = SCNBillboardConstraint()
             
+            billBoardCostraint.freeAxes = .all
+            
             removeButtonNode.constraints = [billBoardCostraint]
             
             let appearAnimation = SCNAction.scale(to: CGFloat(graphScale), duration: 0.5)
@@ -507,10 +502,36 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             appearAnimation.timingMode = .easeOut
             
             graphNode.runAction(appearAnimation)
-        
-            let newGraph = Graph(content: "", node: graphNode, relatedRemoveButtonNode: removeButtonNode)
             
-            self.graphs.append(newGraph)
+            let newGraph = graphToCreate.first
+            
+            newGraph?.setNode(node: graphNode)
+            
+            newGraph?.setRemoveButtonNode(relatedRemoveButtonNode: removeButtonNode)
+            
+            graphToCreate.removeFirst()
+            
+            self.graphs.append(newGraph!)
+            
+            let points = newGraph?.getPoints()
+            
+            for point in points!
+            {
+                if let pointScene = SCNScene(named: "art.scnassets/PointModel.scn")
+                {
+                    let pointNode = pointScene.rootNode.childNodes.first!
+                    
+                    graphNode.addChildNode(pointNode)
+                    
+                    pointNode.geometry!.firstMaterial!.diffuse.contents = point.color
+                    
+                    let (_,max) = graphNode.boundingBox
+                    
+                    /*pointNode.worldPosition.x = point.position.x * max.x
+                    pointNode.worldPosition.y = point.position.y * max.y
+                    pointNode.worldPosition.z = point.position.z * max.z*/
+                }
+            }
             
             return newGraph
         }

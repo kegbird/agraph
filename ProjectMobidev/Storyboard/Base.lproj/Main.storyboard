@@ -166,23 +166,22 @@
                                     <action selector="btnAddTouchDown:" destination="BV1-FR-VrT" eventType="touchUpInside" id="6NA-K1-msb"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="70X-Qk-YCZ" userLabel="btnTakePhoto" customClass="UIRoundButton" customModule="ProjectMobidev" customModuleProvider="target">
-                                <rect key="frame" x="169.5" y="767" width="75" height="75"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="70X-Qk-YCZ" userLabel="btnTakePhoto" customClass="UIRoundButton" customModule="ProjectMobidev" customModuleProvider="target">
+                                <rect key="frame" x="20" y="767" width="75" height="75"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="75" id="CHK-CJ-S64"/>
                                     <constraint firstAttribute="width" constant="75" id="zMy-r7-itL"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="75"/>
                                 <inset key="contentEdgeInsets" minX="0.0" minY="-10" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="+">
+                                <state key="normal" image="camIcon">
                                     <color key="titleColor" white="1" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <integer key="value" value="35"/>
+                                        <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                                        <integer key="value" value="4"/>
+                                        <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                         <color key="value" white="1" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -223,12 +222,12 @@
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="70X-Qk-YCZ" secondAttribute="bottom" constant="20" id="EQH-dD-HGy"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GsS-dJ-CKf"/>
                             <constraint firstItem="kMP-GG-eI0" firstAttribute="centerX" secondItem="U0K-SW-4ec" secondAttribute="centerX" id="IND-IY-48J"/>
-                            <constraint firstItem="70X-Qk-YCZ" firstAttribute="centerX" secondItem="U0K-SW-4ec" secondAttribute="centerX" id="R2C-om-Fzg"/>
                             <constraint firstItem="kMP-GG-eI0" firstAttribute="centerY" secondItem="U0K-SW-4ec" secondAttribute="centerY" id="U6Z-hT-J1i"/>
                             <constraint firstItem="iIO-65-m1q" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="UBb-4a-eTU"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="bottom" secondItem="fQZ-KI-GVf" secondAttribute="bottom" id="VpT-BR-CcM"/>
                             <constraint firstItem="iIO-65-m1q" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="W6V-Sp-L2g"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="XyZ-9z-H8e"/>
+                            <constraint firstItem="70X-Qk-YCZ" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" constant="20" id="aRP-bI-EGE"/>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="trailing" secondItem="LWd-Wg-MpI" secondAttribute="trailing" constant="20" id="cAS-5e-Geq"/>
                             <constraint firstItem="iIO-65-m1q" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" id="kAA-r6-7U3"/>
                             <constraint firstItem="qCj-r5-w6D" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="kUI-wu-ed5"/>
@@ -319,6 +318,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="camIcon" width="64" height="64"/>
         <image name="crossAIrIcon" width="27" height="27"/>
     </resources>
 </document>
