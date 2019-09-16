@@ -280,7 +280,14 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             let result = sceneView.hitTest(location, options: nil).first
             
             guard let node = result?.node
-            else { return }
+            else
+            {
+                if currentMode == .editMode
+                {
+                    disableEditMode()
+                }
+                return
+            }
             
             if node.categoryBitMask == 5
             {
@@ -333,7 +340,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 disableEditMode()
             }
         }
-        else if currentMode == .placingMode
+        else if currentMode == .placingMode && aimOnThePlane
         {
             placeTheGraph = true
         }
@@ -513,25 +520,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             self.graphs.append(newGraph!)
             
-            let points = newGraph?.getPoints()
+            newGraph?.addPointsToScene()
             
-            for point in points!
-            {
-                if let pointScene = SCNScene(named: "art.scnassets/PointModel.scn")
-                {
-                    let pointNode = pointScene.rootNode.childNodes.first!
-                    
-                    graphNode.addChildNode(pointNode)
-                    
-                    pointNode.geometry!.firstMaterial!.diffuse.contents = point.color
-                    
-                    let (_,max) = graphNode.boundingBox
-                    
-                    /*pointNode.worldPosition.x = point.position.x * max.x
-                    pointNode.worldPosition.y = point.position.y * max.y
-                    pointNode.worldPosition.z = point.position.z * max.z*/
-                }
-            }
+            newGraph?.add3dTitle()
             
             return newGraph
         }

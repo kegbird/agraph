@@ -11,6 +11,8 @@ import ARKit
 
 class Graph
 {
+    static var offset : Float = 0.045
+    
     var title : String
     
     var node : SCNNode!
@@ -73,6 +75,19 @@ class Graph
                 point.position.x = (point.position.x - minX!) / (maxX! - minX!)
                 point.position.y = (point.position.y - minY!) / (maxY! - minY!)
                 point.position.z = (point.position.z - minZ!) / (maxZ! - minZ!)
+                
+                if point.position.x.isNaN
+                {
+                    point.position.x = 0
+                }
+                if point.position.y.isNaN
+                {
+                    point.position.y = 0
+                }
+                if point.position.z.isNaN
+                {
+                    point.position.z = 0
+                }
             }
         }
     }
@@ -90,6 +105,56 @@ class Graph
     func getNode() -> SCNNode
     {
         return node
+    }
+    
+    func add3dTitle()
+    {
+        let arTitle = SCNText(string: title, extrusionDepth: CGFloat(5))
+        
+        let textMaterial = SCNMaterial()
+        
+        textMaterial.diffuse.contents = UIColor.white
+        
+        arTitle.materials = [textMaterial]
+        
+        let arTitleNode = SCNNode()
+        
+        arTitleNode.geometry = arTitle
+        
+        node.addChildNode(arTitleNode)
+        
+        arTitleNode.position = SCNVector3(0, 1, 0)
+        
+        let (_,max) = arTitleNode.boundingBox
+        
+        arTitleNode.position.x -= (max.x/2) * arTitleNode.scale.x
+        
+        arTitleNode.scale = SCNVector3(0.05,0.05,0.05)
+    }
+    
+    func addPointsToScene()
+    {
+        for point in points
+        {
+            if let pointScene = SCNScene(named: "art.scnassets/PointModel.scn")
+            {
+                let pointNode = pointScene.rootNode.childNodes.first!
+                
+                node.addChildNode(pointNode)
+                
+                pointNode.geometry!.firstMaterial!.diffuse.contents = point.color
+                
+                let (min,max) = node.boundingBox
+                
+                var diagonal = SCNVector3(x: max.x - min.x, y: max.y - min.y, z: max.z - min.z)
+                
+                diagonal.x = (point.position.x * diagonal.x) - diagonal.x * 0.5
+                diagonal.y = (point.position.y * diagonal.y) - diagonal.y * 0.5
+                diagonal.z = (point.position.z * diagonal.z) - diagonal.z * 0.5
+                
+                pointNode.position = diagonal
+            }
+        }
     }
     
     func setRemoveButtonNode(relatedRemoveButtonNode: SCNNode)
@@ -135,7 +200,11 @@ class Graph
         
         node.position.z = distanceFromPlane
         
-        let removeButtonWorldPosition = node.convertPosition(node.boundingBox.max, to: scene?.scene.rootNode)
+        var removeButtonWorldPosition = node.convertPosition(node.boundingBox.max, to: scene?.scene.rootNode)
+        
+        removeButtonWorldPosition.x += Graph.offset
+        removeButtonWorldPosition.y += Graph.offset
+        removeButtonWorldPosition.z -= Graph.offset
         
         relatedRemoveButtonNode.worldPosition = removeButtonWorldPosition
     }

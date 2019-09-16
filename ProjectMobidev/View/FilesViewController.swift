@@ -74,9 +74,9 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         
                         let position = SCNVector3(x: x!, y: y!, z: z!)
                         
-                        let r = Int(values[3])!/255
-                        let g = Int(values[4])!/255
-                        let b = Int(values[5])!/255
+                        let r = Float(values[3])!/255.0
+                        let g = Float(values[4])!/255.0
+                        let b = Float(values[5])!/255.0
                         
                         let color = UIColor(red: CGFloat(r), green: CGFloat(g), blue: CGFloat(b), alpha: CGFloat(1))
                         
