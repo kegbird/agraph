@@ -49,7 +49,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     let distanceFromPlane : Float = 0.3
     
-    var middleScreen : CGPoint?
+    var middleScreen : CGPoint!
+    
+    var valuePrinted = false
     
     override var prefersStatusBarHidden: Bool
     {
@@ -178,6 +180,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             if placeTheGraph
             {
                 guard graphToBePlaced != nil else { return }
+                displayGraphPreview(worldPosition: projectedPoint)
                 graphToBePlaced.setGraphColor(color: UIColor.white)
                 graphToBePlaced = nil
                 
@@ -225,6 +228,35 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 }
             }
         }
+        else if currentMode == .watchingMode
+        {
+            let result = sceneView.hitTest(middleScreen!, options: [SCNHitTestOption.categoryBitMask : Graph.pointBitMask]).first
+            
+            guard let node = result?.node
+                else
+            {
+                return
+            }
+            
+            if node.categoryBitMask == Graph.pointBitMask
+            {
+                //printare il punto
+                let relativeGraph = getGraphObject(node: node.parent)
+                
+                if let point = relativeGraph?.getPointsCoordinateForNode(pointNode: node)
+                {
+                    let pointToPrint = String(point.position.x)+","+String(point.position.y)+","+String(point.position.z)
+                    
+                    labelModifyCount += 1
+                    DispatchQueue.main.async
+                    { [weak self] in
+                        self?.infoLabel.text = pointToPrint
+                    }
+                    
+                    valuePrinted = true
+                }
+            }
+        }
     }
     
     //Input buttons
@@ -267,10 +299,14 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     //Gesture recognizer actions
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        if currentMode == .editMode, let location = touches.first?.location(in: sceneView)
+
+        if currentMode == .editMode
         {
-            let result = sceneView.hitTest(location, options: nil).first
+            let location = touches.first?.location(in: sceneView)
+            
+            guard location != nil else { return }
+            
+            let result = sceneView.hitTest(location!, options: nil).first
             
             guard let node = result?.node
             else
@@ -282,7 +318,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 return
             }
             
-            if node.categoryBitMask == 5
+            if node.categoryBitMask == Graph.removeButtonBitMask
             {
                 let i = getRemoveButtonIndex(removeButton: node)
                 
@@ -294,27 +330,52 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 graphToRemove.removeGraphFromScene()
                 
-                updateInfoLabel(infoType: .GraphRemoved)
-                labelModifyCount += 1
-                let copy = labelModifyCount
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    [weak self] in
-                    if copy == self?.labelModifyCount
-                    {
-                        self?.updateInfoLabel(infoType: .NothingToDo)
-                        self?.labelModifyCount = 0
+                if graphs.count == 0
+                {
+                    updateInfoLabel(infoType: .GraphRemoved)
+                    labelModifyCount += 1
+                    let copy = labelModifyCount
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        [weak self] in
+                        if copy == self?.labelModifyCount
+                        {
+                            self?.updateInfoLabel(infoType: .AllGraphRemoved)
+                            self?.labelModifyCount = 0
+                        }
+                    }
+                    
+                    currentMode = .watchingMode
+                }
+                else
+                {
+                    updateInfoLabel(infoType: .GraphRemoved)
+                    labelModifyCount += 1
+                    let copy = labelModifyCount
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        [weak self] in
+                        if copy == self?.labelModifyCount
+                        {
+                            self?.updateInfoLabel(infoType: .NothingToDo)
+                            self?.labelModifyCount = 0
+                        }
                     }
                 }
             }
-            else if node.categoryBitMask != 4
+            else if node.categoryBitMask != Graph.graphBitMask
             {
                 disableEditMode()
             }
         }
         else if currentMode == .placingMode && aimOnThePlane
         {
+            guard graphToBePlaced != nil else { return }
             placeTheGraph = true
+        }
+        else if currentMode == .watchingMode && valuePrinted
+        {
+            infoLabel.text = ""
         }
     }
     
@@ -557,7 +618,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     {
                 let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
                 
-                plane.firstMaterial?.diffuse.contents = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.5)
+                plane.firstMaterial?.diffuse.contents = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.8)
                 
                 planeNode = SCNNode(geometry: plane)
                 
@@ -680,6 +741,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func updateInfoLabel(infoType : InfoUpdate)
     {
+        valuePrinted = false
+        
         switch infoType {
         case .EditModeOn:
             infoLabel.text = "Edit mode activated"
@@ -704,6 +767,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             break
         case .GraphRemoved:
             infoLabel.text = "Graph removed"
+            break
+        case .AllGraphRemoved:
+            infoLabel.text = "All graph have been removed"
             break
         default:
             break

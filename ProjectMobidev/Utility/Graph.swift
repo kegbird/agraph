@@ -11,7 +11,13 @@ import ARKit
 
 class Graph
 {
-    static let offset : Float = 0.045
+    static let graphBitMask = 4
+    
+    static let removeButtonBitMask = 5
+    
+    static let pointBitMask = 10
+    
+    static let buttonOffset : Float = 0.045
     
     static let titleOffset : Float = 0.18
 
@@ -33,16 +39,15 @@ class Graph
     
     var relatedRemoveButtonNode : SCNNode!
     
-    var points : [Point] = []
+    var points : [(Point, SCNNode)] = []
     
     init(title: String, points : [Point]) {
-        self.points = points
-        
+
         if let graphScene = SCNScene(named: "art.scnassets/GraphModel.scn")
         {
             self.graphNode = graphScene.rootNode.childNodes.first!
             
-            graphNode.categoryBitMask = 4
+            graphNode.categoryBitMask = Graph.graphBitMask
             
             graphNode.geometry!.firstMaterial!.multiply.contents = Graph.placingColor
             
@@ -58,7 +63,9 @@ class Graph
             
             relatedRemoveButtonNode = SCNNode(geometry: removeButtonPlane)
             
-            relatedRemoveButtonNode.categoryBitMask = 5
+            relatedRemoveButtonNode.categoryBitMask = Graph.removeButtonBitMask
+            
+            relatedRemoveButtonNode.castsShadow = false
             
             relatedRemoveButtonNode.isHidden = true
             
@@ -134,24 +141,28 @@ class Graph
             
             for point in points
             {
+                var pointNormalizedPosition = point.position
+                
                 if (maxX - minX) != 0
                 {
-                    point.position.x = (point.position.x - minX) / (maxX - minX)
+                    pointNormalizedPosition.x = (point.position.x - minX) / (maxX - minX)
                 }
                 
                 if (maxY - minY) != 0
                 {
-                    point.position.y = (point.position.y - minY) / (maxY - minY)
+                    pointNormalizedPosition.y = (point.position.y - minY) / (maxY - minY)
                 }
                 
                 if (maxZ - minZ) != 0
                 {
-                    point.position.z = (point.position.z - minZ) / (maxZ - minZ)
+                    pointNormalizedPosition.z = (point.position.z - minZ) / (maxZ - minZ)
                 }
                 
                 if let pointScene = SCNScene(named: "art.scnassets/PointModel.scn")
                 {
                     let pointNode = pointScene.rootNode.childNodes.first!
+                    
+                    pointNode.categoryBitMask = Graph.pointBitMask
                     
                     graphNode.addChildNode(pointNode)
                     
@@ -163,16 +174,17 @@ class Graph
                     
                     var diagonal = SCNVector3(x: max.x - min.x, y: max.y - min.y, z: max.z - min.z)
                     
-                    diagonal.x = (point.position.x * diagonal.x)
-                    diagonal.y = (point.position.y * diagonal.y)
-                    diagonal.z = (point.position.z * diagonal.z)
+                    diagonal.x = (pointNormalizedPosition.x * diagonal.x)
+                    diagonal.y = (pointNormalizedPosition.y * diagonal.y)
+                    diagonal.z = (pointNormalizedPosition.z * diagonal.z)
                     
                     pointNode.position.x += diagonal.x
                     pointNode.position.y += diagonal.y
                     pointNode.position.z += diagonal.z
+                    
+                    self.points.append((point, pointNode))
                 }
             }
-            
         }
     
         let scnTitleText = SCNText(string: title, extrusionDepth: CGFloat(3))
@@ -193,14 +205,11 @@ class Graph
         
         titleNode.scale = SCNVector3(0, 0, 0)
         
+        titleNode.castsShadow = false
+        
         let (min,max) = titleNode.boundingBox
         
         titleNode.pivot = SCNMatrix4MakeTranslation((max.x - min.x) / 2, 0, 0);
-    }
-    
-    func getPoints() -> [Point]
-    {
-        return points
     }
     
     func getGraphNode() -> SCNNode
@@ -217,9 +226,9 @@ class Graph
     {
         guard graphNode.parent != nil else { return }
         
-        let appearGraphAnimation = SCNAction.scale(to: CGFloat(Graph.graphScale), duration: 0.2)
+        let appearGraphAnimation = SCNAction.scale(to: CGFloat(Graph.graphScale), duration: 0.1)
         
-        let appearTitleAnimation = SCNAction.scale(to: CGFloat(Graph.titleScale), duration: 0.2)
+        let appearTitleAnimation = SCNAction.scale(to: CGFloat(Graph.titleScale), duration: 0.1)
         
         appearGraphAnimation.timingMode = .easeIn
         
@@ -330,7 +339,7 @@ class Graph
     
     func shakeGraph()
     {
-        let appearRemoveButton = SCNAction.fadeOpacity(to: 1, duration: 0.2)
+        let appearRemoveButton = SCNAction.fadeOpacity(to: 1, duration: 0.1)
         
         let a1 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.075)
         let a2 = SCNAction.rotateBy(x: 0, y: 0, z: -0.1, duration: 0.075)
@@ -375,16 +384,6 @@ class Graph
         relatedRemoveButtonNode.runAction(hideRemoveGraphButton)
     }
     
-    func setGraphNodeBitmask(mask : Int)
-    {
-        graphNode.categoryBitMask = mask
-    }
-    
-    func setRemoveButtonBitmask(mask : Int)
-    {
-        relatedRemoveButtonNode.categoryBitMask = mask
-    }
-    
     func setParentNode(parent : SCNNode)
     {
         parent.addChildNode(graphNode)
@@ -421,6 +420,19 @@ class Graph
         titleNode.runAction(fadeAnimation)
     }
     
+    func getPointsCoordinateForNode(pointNode : SCNNode) -> Point?
+    {
+        for p in points
+        {
+            if p.1 == pointNode
+            {
+                return p.0
+            }
+        }
+        
+        return nil
+    }
+    
     func setGraphWorldPosition(worldPosition : SCNVector3, distanceFromPlane : Float, scene : ARSCNView?)
     {
         guard scene != nil else { return }
@@ -431,9 +443,9 @@ class Graph
         
         var removeButtonWorldPosition = graphNode.convertPosition(graphNode.boundingBox.max, to: scene?.scene.rootNode)
         
-        removeButtonWorldPosition.x += Graph.offset
-        removeButtonWorldPosition.y += Graph.offset
-        removeButtonWorldPosition.z -= Graph.offset
+        removeButtonWorldPosition.x += Graph.buttonOffset
+        removeButtonWorldPosition.y += Graph.buttonOffset
+        removeButtonWorldPosition.z -= Graph.buttonOffset
         
         relatedRemoveButtonNode.worldPosition = removeButtonWorldPosition
         

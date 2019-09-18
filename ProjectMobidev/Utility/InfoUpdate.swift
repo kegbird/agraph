@@ -8,6 +8,7 @@
 
 enum InfoUpdate {
     case TapOnAddAdvice
+    case AllGraphRemoved
     case NothingToDo
     case AimToThePlane
     case TapToPlace
