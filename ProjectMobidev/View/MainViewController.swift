@@ -23,7 +23,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var lastAdjustment = Double(0.0)
     
-    var updateFrequency = Double(0.25)
+    var updateFrequency = Double(0.1)
     
     var lastPanLocation = SCNVector3(x: 0, y:0, z:0)
     
@@ -33,15 +33,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var originalScale = Float(0)
     
-    var originalColor = UIColor.white
+    var aimOnThePlane = false
     
-    let highlightColor = UIColor.red
-    
-    let placingObjectColor = UIColor.yellow
-    
-    var aimOnThePlane : Bool = false
-    
-    var placeTheGraph : Bool = false
+    var placeTheGraph = false
     
     var labelModifyCount : Int = 0
     
@@ -55,10 +49,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     let distanceFromPlane : Float = 0.3
     
-    let graphScale : Float = 0.15
-    
-    let buttonScale : Float = 0.065
-    
     var middleScreen : CGPoint?
     
     override var prefersStatusBarHidden: Bool
@@ -69,6 +59,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     @IBAction func prepareForUnwind(segue: UIStoryboardSegue) {
         if graphToCreate.count > 0
         {
+            graphs.append(contentsOf: graphToCreate)
             currentMode = .placingMode
             updateInfoLabel(infoType: .AimToThePlane)
         }
@@ -99,6 +90,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
+        
+        sceneView.debugOptions = [SCNDebugOptions.showCreases, SCNDebugOptions.showBoundingBoxes]
 
         // Create a new scene
         let scene = SCNScene(named: "art.scnassets/GraphScene.scn")!
@@ -169,7 +162,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     }
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        guard planeRoot != nil else { return }
+        guard planeRoot != nil, planeNode != nil else { return }
         
         if time - lastAdjustment > updateFrequency
         {
@@ -217,11 +210,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             if CheckIfPointOverReferencePlane(projectedPoint: projectedPoint)
             {
                 DispatchQueue.main.async
-                { [weak self, projectedPoint] in
+                { [weak self] in
                     self?.updateInfoLabel(infoType: .TapToPlace)
-                    self?.displayGraphPreview(worldPosition: projectedPoint)
-                    self?.aimOnThePlane = true
                 }
+                displayGraphPreview(worldPosition: projectedPoint)
+                aimOnThePlane = true
             }
             else
             {
@@ -295,32 +288,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 guard i != -1 else { return }
                 
-                let removedGraph = graphs[i]
+                let graphToRemove = graphs[i]
                 
                 graphs.remove(at: i)
                 
-                removedGraph.getNode().categoryBitMask = 6
-                removedGraph.getRemoveButtonNode().categoryBitMask = 6
-
-                let duration : TimeInterval = 0.2
-                
-                let fadeAnimation = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
-                    
-                    let percentage = elapsedTime / CGFloat(duration)
-                    
-                    if percentage == 1
-                    {
-                        node.removeFromParentNode()
-                    }
-                    else
-                    {
-                        node.opacity = 1 * (1 - percentage)
-                    }
-                    
-                }
-                
-                removedGraph.getNode().runAction(fadeAnimation)
-                removedGraph.getRemoveButtonNode().runAction(fadeAnimation)
+                graphToRemove.removeGraphFromScene()
                 
                 updateInfoLabel(infoType: .GraphRemoved)
                 labelModifyCount += 1
@@ -412,7 +384,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             guard result != nil else { return }
             
             selectedObject = getGraphObject(node: result?.node)
-            highlightSelectedObject()
+            selectedObject.highlightGraphNode()
                 
             if currentMode == .watchingMode
             {
@@ -442,7 +414,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         case .ended:
             if selectedObject != nil
             {
-                hideSelectedObject()
+                selectedObject.deselectGraphNode()
                 selectedObject = nil
             }
             break
@@ -460,74 +432,19 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     //Utility functions
     
-    func addGraph(worldPosition: SCNVector3) -> Graph?
+    func displayNewGraph(worldPosition: SCNVector3) -> Graph?
     {
-        if let graphScene = SCNScene(named: "art.scnassets/GraphModel.scn")
-        {
-            let graphNode = graphScene.rootNode.childNodes.first!
+        let newGraph = graphToCreate.first
             
-            graphNode.categoryBitMask = 4
-            
-            planeNode.addChildNode(graphNode)
-            
-            graphNode.worldPosition = worldPosition
-            
-            graphNode.geometry!.firstMaterial!.multiply.contents = placingObjectColor
-            
-            graphNode.scale = SCNVector3(x: 0, y: 0, z: 0)
-            
-            let removeButtonPlane = SCNPlane(width: 1, height: 1)
-            
-            let removeButtonMaterial = SCNMaterial()
-            
-            removeButtonMaterial.diffuse.contents = UIImage(named: "removeIcon")
-            
-            removeButtonPlane.materials = [removeButtonMaterial]
-            
-            let removeButtonNode = SCNNode(geometry: removeButtonPlane)
-            
-            removeButtonNode.categoryBitMask = 5
-            
-            planeNode.addChildNode(removeButtonNode)
-            
-            removeButtonNode.isHidden = true
-            
-            removeButtonNode.opacity = 0
-            
-            removeButtonNode.scale = SCNVector3(x: buttonScale, y: buttonScale, z: buttonScale)
-            
-            removeButtonNode.worldPosition = graphNode.convertPosition(graphNode.boundingBox.max, to: sceneView.scene.rootNode)
-            
-            let billBoardCostraint = SCNBillboardConstraint()
-            
-            billBoardCostraint.freeAxes = .all
-            
-            removeButtonNode.constraints = [billBoardCostraint]
-            
-            let appearAnimation = SCNAction.scale(to: CGFloat(graphScale), duration: 0.5)
-            
-            appearAnimation.timingMode = .easeOut
-            
-            graphNode.runAction(appearAnimation)
-            
-            let newGraph = graphToCreate.first
-            
-            newGraph?.setNode(node: graphNode)
-            
-            newGraph?.setRemoveButtonNode(relatedRemoveButtonNode: removeButtonNode)
-            
-            graphToCreate.removeFirst()
-            
-            self.graphs.append(newGraph!)
-            
-            newGraph?.addPointsToScene()
-            
-            newGraph?.add3dTitle()
-            
-            return newGraph
-        }
+        graphToCreate.removeFirst()
         
-        return nil
+        newGraph?.setParentNode(parent: planeNode)
+        
+        newGraph?.runAppearAnimation()
+        
+        newGraph?.setGraphWorldPosition(worldPosition: worldPosition, distanceFromPlane: distanceFromPlane, scene: sceneView)
+        
+        return newGraph
     }
     
     func disableEditMode()
@@ -553,7 +470,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         currentMode = .watchingMode
         selectedObject = nil
         originalScale = 0
-        originalColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 255/255)
         return
     }
     
@@ -617,120 +533,18 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func shakeAllObjects()
     {
-        var i = 0
-        
-        let appearRemoveButton = SCNAction.fadeOpacity(to: 1, duration: 0.2)
-        
         for graph in graphs
         {
-            let a1 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.075)
-            let a2 = SCNAction.rotateBy(x: 0, y: 0, z: -0.1, duration: 0.075)
-            let a3 = SCNAction.rotateBy(x: 0, y: 0, z: -0.1, duration: 0.075)
-            let a4 = SCNAction.rotateBy(x: 0, y: 0, z: 0.1, duration: 0.075)
-            let sequence = SCNAction.sequence([a1,a2,a3,a4])
-            let animation = SCNAction.repeatForever(sequence)
-            graph.getNode().runAction(animation, forKey: "shake")
-            
-            //mostro il suo remove button
-            graph.getRemoveButtonNode().isHidden = false
-            graph.getRemoveButtonNode().runAction(appearRemoveButton)
-            i=i+1
+            graph.shakeGraph()
         }
     }
     
     func stopAllShakingObjects()
     {
-        var i = 0
-        
-        let duration: TimeInterval = 0.1
-        
-        let hideRemoveGraphButton = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
-            
-            let percentage = elapsedTime / CGFloat(duration)
-            
-            if percentage == 1
-            {
-                node.opacity = 0
-                node.isHidden=true
-            }
-            else
-            {
-                node.opacity = 1 * (1-percentage)
-            }
-            
-        }
-        
         for graph in graphs
         {
-            let graphNode = graph.getNode()
-            let removeButtonNode = graph.getRemoveButtonNode()
-            graphNode.removeAction(forKey: "shake")
-            graphNode.rotation = SCNVector4(x:0, y:0, z:0, w:0)
-            removeButtonNode.removeAllActions()
-            removeButtonNode.runAction(hideRemoveGraphButton)
-            i=i+1
+            graph.stopShake()
         }
-    }
-    
-    func highlightSelectedObject()
-    {
-        guard selectedObject != nil else { return }
-        
-        let currentColor = selectedObject.getGraphCurrentColor()
-        
-        originalColor = currentColor
-        
-        let duration: TimeInterval = 0.2
-        
-        let colorAnimation = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
-            let percentage = elapsedTime / CGFloat(duration)
-            
-            let (fromRed, fromGreen, fromBlue, _) = currentColor.getComponents()
-            
-            let (toRed, toGreen, toBlue, _) = self.highlightColor.getComponents()
-            
-            let finalColor = UIColor(red: fromRed*(1-percentage)+toRed*percentage, green: fromGreen*(1-percentage)+toGreen*percentage, blue: fromBlue*(1-percentage)+toBlue*percentage, alpha: 255/255)
-            
-            node.geometry!.firstMaterial!.multiply.contents = finalColor
-        }
-        
-        let scaleAnimation : SCNAction
-        
-        originalScale = Float(selectedObject.getGraphScale().x)
-        
-        var finalScale = selectedObject.getGraphScale().x
-        finalScale = finalScale * 1.25
-        scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
-        
-        selectedObject.runActionOnGraph(action: colorAnimation)
-        selectedObject.runActionOnGraph(action: scaleAnimation)
-    }
-    
-    func hideSelectedObject()
-    {
-        let currentColor = selectedObject.getGraphCurrentColor()
-        let duration: TimeInterval = 0.2
-            
-        let colorAnimation = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> () in
-            let percentage = elapsedTime / CGFloat(duration)
-                
-            let (fromRed, fromGreen, fromBlue, _) = currentColor.getComponents()
-                
-            let (toRed, toGreen, toBlue, _) = self.originalColor.getComponents()
-                
-            let finalColor = UIColor(red: fromRed*(1-percentage)+toRed*percentage, green: fromGreen*(1-percentage)+toGreen*percentage, blue: fromBlue*(1-percentage)+toBlue*percentage, alpha: 255/255)
-            
-            node.geometry!.firstMaterial!.multiply.contents = finalColor
-        }
-        
-        let scaleAnimation : SCNAction
-        
-        let finalScale = originalScale
-        
-        scaleAnimation = SCNAction.scale(to: CGFloat(finalScale) , duration: 0.1)
-        
-        selectedObject.runActionOnGraph(action: colorAnimation)
-        selectedObject.runActionOnGraph(action: scaleAnimation)
     }
     
     func adjustCoordinateSystem()
@@ -741,13 +555,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func displayReferencePlane(imageAnchor: ARImageAnchor, node: SCNNode)
     {
-        DispatchQueue.main.async
-            { [weak self] in
                 let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
                 
-                plane.firstMaterial?.diffuse.contents = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.8)
+                plane.firstMaterial?.diffuse.contents = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.5)
                 
-                let planeNode = SCNNode(geometry: plane)
+                planeNode = SCNNode(geometry: plane)
                 
                 planeNode.eulerAngles.x = -.pi/2
                 
@@ -755,16 +567,14 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 node.categoryBitMask = 0
                 
-                self?.planeNode = planeNode
-                
-                self?.planeRoot = node
+                planeRoot = node
             
-                for graph in self!.graphs
+                for graph in graphs
                 {
-                    planeNode.addChildNode(graph.getNode())
+                    planeNode.addChildNode(graph.getGraphNode())
+                    planeNode.addChildNode(graph.getTitleNode())
                     planeNode.addChildNode(graph.getRemoveButtonNode())
                 }
-        }
     }
     
     func getGraphIndex(graph: SCNNode) -> Int
@@ -772,7 +582,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         var i = 0
         for g in graphs
         {
-            if graph == g.getNode()
+            if graph == g.getGraphNode()
             {
                 return i
             }
@@ -846,7 +656,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     {
         if graphToBePlaced == nil
         {
-            graphToBePlaced = addGraph(worldPosition: worldPosition)
+            graphToBePlaced = displayNewGraph(worldPosition: worldPosition)
         }
         else
         {
@@ -859,7 +669,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         guard node != nil else { return nil }
         for g in graphs
         {
-            if g.getNode() == node
+            if g.getGraphNode() == node
             {
                 return g
             }
