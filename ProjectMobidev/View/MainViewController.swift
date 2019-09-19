@@ -89,11 +89,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         // Set the view's delegate
         sceneView.delegate = self
-        
-        // Show statistics such as fps and timing information
-        sceneView.showsStatistics = true
-        
-        sceneView.debugOptions = [SCNDebugOptions.showCreases, SCNDebugOptions.showBoundingBoxes]
 
         // Create a new scene
         let scene = SCNScene(named: "art.scnassets/GraphScene.scn")!
@@ -102,6 +97,15 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         sceneView.scene = scene
         
         middleScreen = self.view.center
+        
+        if Dropbox.getDropboxClient() == nil
+            {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(self.btnAddTouchDown),
+                name: NSNotification.Name("performSegueToFilesViewController"),
+                object: nil)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -245,7 +249,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 if let point = relativeGraph?.getPointsCoordinateForNode(pointNode: node)
                 {
-                    let pointToPrint = String(point.position.x)+","+String(point.position.y)+","+String(point.position.z)
+                    let pointToPrint = String(point.position.x)+", "+String(point.position.y)+", "+String(point.position.z)
                     
                     labelModifyCount += 1
                     DispatchQueue.main.async
@@ -262,6 +266,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     //Input buttons
     
     @IBAction func btnAddTouchDown(_ sender: Any) {
+        AudioServicesPlaySystemSound(1103)
+        
         guard currentMode != .placingMode else {
             Alert.DisplayPopUpAndDismiss(viewController: self, title: "Reminder", message: "Place all selected graphs before.", style: .default)
             return
@@ -274,7 +280,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         else
         {
             self.performSegue(withIdentifier: "toDownloadFileListViewController", sender: nil)
-
+            
             if currentMode == .editMode
             {
                 disableEditMode()
@@ -283,8 +289,29 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     }
     
     @IBAction func btnTakePhotoTouchDown(_ sender: Any) {
-        let snapShot = self.sceneView.snapshot()
-        UIImageWriteToSavedPhotosAlbum(snapShot, self, #selector(saveImageCallback(_:didFinishSavingWithError:contextInfo:)), nil)
+        
+        let bounds = sceneView.bounds
+        UIGraphicsBeginImageContextWithOptions(bounds.size, true, UIScreen.main.scale)
+        sceneView.drawHierarchy(in: bounds, afterScreenUpdates: true)
+        let screenShot = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        UIImageWriteToSavedPhotosAlbum(screenShot!, nil, nil, nil)
+        
+        updateInfoLabel(infoType: .PhotoTaken)
+        labelModifyCount += 1
+        let copy = labelModifyCount
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            [weak self] in
+            if copy == self?.labelModifyCount
+            {
+                self?.updateInfoLabel(infoType: .NothingToDo)
+                self?.labelModifyCount = 0
+            }
+        }
+        
+        AudioServicesPlaySystemSound(1108);
     }
     
     @objc func saveImageCallback(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
@@ -669,12 +696,18 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         return -1
     }
+
     
     func authorizeApp(){
         DropboxClientsManager.authorizeFromController(UIApplication.shared,
                                                       controller: self,
                                                       openURL: { (url: URL) -> Void in
-                                                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                                                        UIApplication.shared.open(url, options: [:], completionHandler: {
+                                                            status in
+                                                            
+                                                            Alert.DisplayPopUpAndDismiss(viewController: self, title: "Error", message: "Authentication canceled by the user.", style: .destructive)
+                                                            return
+                                                        })
         })
     }
     
@@ -771,6 +804,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         case .AllGraphRemoved:
             infoLabel.text = "All graph have been removed"
             break
+        case .PhotoTaken:
+            infoLabel.text = "Photo taken!"
         default:
             break
         }
@@ -798,5 +833,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             clearSceneGraph()
         }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, forKeyPath: "performSegueToFilesViewController")
     }
 }

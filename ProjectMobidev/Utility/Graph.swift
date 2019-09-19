@@ -145,17 +145,17 @@ class Graph
                 
                 if (maxX - minX) != 0
                 {
-                    pointNormalizedPosition.x = (point.position.x - minX) / (maxX - minX)
+                    pointNormalizedPosition.x = 2*(point.position.x - minX) / (maxX - minX)
                 }
                 
                 if (maxY - minY) != 0
                 {
-                    pointNormalizedPosition.y = (point.position.y - minY) / (maxY - minY)
+                    pointNormalizedPosition.y = 2*(point.position.y - minY) / (maxY - minY)
                 }
                 
                 if (maxZ - minZ) != 0
                 {
-                    pointNormalizedPosition.z = (point.position.z - minZ) / (maxZ - minZ)
+                    pointNormalizedPosition.z = 2*(point.position.z - minZ) / (maxZ - minZ)
                 }
                 
                 if let pointScene = SCNScene(named: "art.scnassets/PointModel.scn")
@@ -168,19 +168,11 @@ class Graph
                     
                     pointNode.geometry!.firstMaterial!.diffuse.contents = point.color
                     
-                    let (min,max) = graphNode.boundingBox
+                    pointNode.position = pointNormalizedPosition
                     
-                    pointNode.position = min
-                    
-                    var diagonal = SCNVector3(x: max.x - min.x, y: max.y - min.y, z: max.z - min.z)
-                    
-                    diagonal.x = (pointNormalizedPosition.x * diagonal.x)
-                    diagonal.y = (pointNormalizedPosition.y * diagonal.y)
-                    diagonal.z = (pointNormalizedPosition.z * diagonal.z)
-                    
-                    pointNode.position.x += diagonal.x
-                    pointNode.position.y += diagonal.y
-                    pointNode.position.z += diagonal.z
+                    pointNode.position.x -= 1
+                    pointNode.position.y -= 1
+                    pointNode.position.z -= 1
                     
                     self.points.append((point, pointNode))
                 }

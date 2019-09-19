@@ -17,7 +17,27 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AGraph" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xzV-R8-cBj">
+                                <rect key="frame" x="88.5" y="114" width="237.5" height="78"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="xzV-R8-cBj" secondAttribute="height" multiplier="79:26" id="IgT-VJ-Maq"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Rockwell-Regular" family="Rockwell" pointSize="60"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="3dPlot.png" translatesAutoresizingMaskIntoConstraints="NO" id="xY0-rD-hkn">
+                                <rect key="frame" x="70.5" y="330.5" width="273" height="235"/>
+                            </imageView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="xzV-R8-cBj" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="70" id="Qsc-00-Ffo"/>
+                            <constraint firstItem="xzV-R8-cBj" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="R4R-KI-Mp4"/>
+                            <constraint firstItem="xY0-rD-hkn" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="bQm-Lz-8DP"/>
+                            <constraint firstItem="xY0-rD-hkn" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="j6R-4r-8ei"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="2Rz-z0-qht"/>
@@ -27,4 +47,7 @@
             <point key="canvasLocation" x="962.31884057971024" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="3dPlot.png" width="273" height="234.75"/>
+    </resources>
 </document>

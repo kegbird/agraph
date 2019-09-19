@@ -7,6 +7,7 @@
 //
 
 enum InfoUpdate {
+    case PhotoTaken
     case TapOnAddAdvice
     case AllGraphRemoved
     case NothingToDo

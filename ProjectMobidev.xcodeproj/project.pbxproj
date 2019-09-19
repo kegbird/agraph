@@ -16,6 +16,7 @@
 		704D396F22E1D659000ABF18 /* FileCellTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704D396E22E1D658000ABF18 /* FileCellTableCellView.swift */; };
 		70515A3622EF4BDE00803192 /* DownloadFileListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70515A3522EF4BDE00803192 /* DownloadFileListViewController.swift */; };
 		70515A3822EF697C00803192 /* FilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70515A3722EF697C00803192 /* FilesViewController.swift */; };
+		705224182333D1FC0080A1EB /* 3dPlot.png in Resources */ = {isa = PBXBuildFile; fileRef = 705224172333D1FC0080A1EB /* 3dPlot.png */; };
 		7055503A22F07CEB009D315D /* DownloadFilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7055503922F07CEB009D315D /* DownloadFilesViewController.swift */; };
 		706A0B5C2322837900DB9852 /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706A0B5B2322837900DB9852 /* Graph.swift */; };
 		706A0B5E2322844100DB9852 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706A0B5D2322844100DB9852 /* Point.swift */; };
@@ -32,7 +33,7 @@
 
 /* Begin PBXFileReference section */
 		11A7CBDF789A9656726808D4 /* Pods-ProjectMobidev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProjectMobidev.release.xcconfig"; path = "Target Support Files/Pods-ProjectMobidev/Pods-ProjectMobidev.release.xcconfig"; sourceTree = "<group>"; };
-		7009820522DF763900BAE499 /* ProjectMobidev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectMobidev.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7009820522DF763900BAE499 /* AGraph.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AGraph.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7009820822DF763900BAE499 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7009820A22DF763900BAE499 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; name = art.scnassets; path = ProjectMobidev/art.scnassets; sourceTree = SOURCE_ROOT; };
 		7009820C22DF763900BAE499 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -42,6 +43,7 @@
 		704D396E22E1D658000ABF18 /* FileCellTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCellTableCellView.swift; sourceTree = "<group>"; };
 		70515A3522EF4BDE00803192 /* DownloadFileListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadFileListViewController.swift; sourceTree = "<group>"; };
 		70515A3722EF697C00803192 /* FilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesViewController.swift; sourceTree = "<group>"; };
+		705224172333D1FC0080A1EB /* 3dPlot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3dPlot.png; sourceTree = "<group>"; };
 		7055503922F07CEB009D315D /* DownloadFilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadFilesViewController.swift; sourceTree = "<group>"; };
 		706A0B5B2322837900DB9852 /* Graph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graph.swift; sourceTree = "<group>"; };
 		706A0B5D2322844100DB9852 /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 		700981FC22DF763900BAE499 = {
 			isa = PBXGroup;
 			children = (
+				705224172333D1FC0080A1EB /* 3dPlot.png */,
 				7009820722DF763900BAE499 /* ProjectMobidev */,
 				7009820622DF763900BAE499 /* Products */,
 				0182323BF037E0B640C405E6 /* Pods */,
@@ -92,7 +95,7 @@
 		7009820622DF763900BAE499 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7009820522DF763900BAE499 /* ProjectMobidev.app */,
+				7009820522DF763900BAE499 /* AGraph.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -184,7 +187,7 @@
 			);
 			name = ProjectMobidev;
 			productName = ProjectMobidev;
-			productReference = 7009820522DF763900BAE499 /* ProjectMobidev.app */;
+			productReference = 7009820522DF763900BAE499 /* AGraph.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -226,6 +229,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7009820B22DF763900BAE499 /* art.scnassets in Resources */,
+				705224182333D1FC0080A1EB /* 3dPlot.png in Resources */,
 				7009821522DF763A00BAE499 /* LaunchScreen.storyboard in Resources */,
 				70F1248E2302C79700B92667 /* Assets.xcassets in Resources */,
 				7009821022DF763900BAE499 /* Main.storyboard in Resources */,
@@ -378,6 +382,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = AGraph;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -433,6 +438,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = AGraph;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -444,7 +450,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8A5100EB51B199E339EAF21A /* Pods-ProjectMobidev.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7BS8A3M6NB;
 				INFOPLIST_FILE = ProjectMobidev/Info.plist;
@@ -453,7 +458,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = Unimi.ProjectMobidev;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AGraph;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -463,7 +468,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 11A7CBDF789A9656726808D4 /* Pods-ProjectMobidev.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7BS8A3M6NB;
 				INFOPLIST_FILE = ProjectMobidev/Info.plist;
@@ -472,7 +476,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = Unimi.ProjectMobidev;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AGraph;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

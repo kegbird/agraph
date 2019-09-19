@@ -13,7 +13,7 @@
         <!--Download File List View Controller-->
         <scene sceneID="mOc-Dd-Eni">
             <objects>
-                <viewController modalTransitionStyle="crossDissolve" modalPresentationStyle="overCurrentContext" id="OlC-YG-d49" customClass="DownloadFileListViewController" customModule="ProjectMobidev" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalTransitionStyle="crossDissolve" modalPresentationStyle="overCurrentContext" id="OlC-YG-d49" customClass="DownloadFileListViewController" customModule="AGraph" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" opaque="NO" contentMode="scaleToFill" id="Gzh-dA-Bfs">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -51,7 +51,7 @@
         <!--Files View Controller-->
         <scene sceneID="o6c-c9-B6H">
             <objects>
-                <viewController id="wdA-Nb-zKs" customClass="FilesViewController" customModule="ProjectMobidev" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="wdA-Nb-zKs" customClass="FilesViewController" customModule="AGraph" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="fcP-cQ-w47">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -60,7 +60,7 @@
                                 <rect key="frame" x="0.0" y="88" width="414" height="808"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="fileCell" rowHeight="75" id="jK0-Xl-BE9" customClass="FileTableCellView" customModule="ProjectMobidev" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="fileCell" rowHeight="75" id="jK0-Xl-BE9" customClass="FileTableCellView" customModule="AGraph" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="414" height="75"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jK0-Xl-BE9" id="Pnh-2h-zCw">
@@ -129,7 +129,7 @@
         <!--Main View Controller-->
         <scene sceneID="tXr-a1-R10">
             <objects>
-                <viewController id="BV1-FR-VrT" customClass="MainViewController" customModule="ProjectMobidev" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BV1-FR-VrT" customClass="MainViewController" customModule="AGraph" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" id="U0K-SW-4ec">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -140,7 +140,7 @@
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qCj-r5-w6D">
                                 <rect key="frame" x="0.0" y="88" width="414" height="774"/>
                             </containerView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LWd-Wg-MpI" userLabel="btnAdd" customClass="UIRoundButton" customModule="ProjectMobidev" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LWd-Wg-MpI" userLabel="btnAdd" customClass="UIRoundButton" customModule="AGraph" customModuleProvider="target">
                                 <rect key="frame" x="319" y="765" width="75" height="75"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="75" id="SJT-Qi-NYJ"/>
@@ -166,7 +166,7 @@
                                     <action selector="btnAddTouchDown:" destination="BV1-FR-VrT" eventType="touchUpInside" id="6NA-K1-msb"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="70X-Qk-YCZ" userLabel="btnTakePhoto" customClass="UIRoundButton" customModule="ProjectMobidev" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="70X-Qk-YCZ" userLabel="btnTakePhoto" customClass="UIRoundButton" customModule="AGraph" customModuleProvider="target">
                                 <rect key="frame" x="20" y="767" width="75" height="75"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="75" id="CHK-CJ-S64"/>
@@ -267,7 +267,7 @@
         <!--Download Files View Controller-->
         <scene sceneID="l8u-cc-ZXd">
             <objects>
-                <viewController modalTransitionStyle="crossDissolve" modalPresentationStyle="overCurrentContext" id="abn-TR-4kA" customClass="DownloadFilesViewController" customModule="ProjectMobidev" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalTransitionStyle="crossDissolve" modalPresentationStyle="overCurrentContext" id="abn-TR-4kA" customClass="DownloadFilesViewController" customModule="AGraph" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="rkq-xg-pd7">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
