@@ -14,6 +14,12 @@ protocol DisplayFileList
     func displayDownloadedFileList(files : [Files.Metadata])
 }
 
+/*
+ This view controller just downloads all the .csv file list (just names not their content)
+ of all .csv files, available in the user's dropbox directory.
+ This list is displayed by filesviewcontroller.
+*/
+
 class DownloadFileListViewController: UIViewController {
     
     @IBOutlet weak var infoLabel: UILabel!

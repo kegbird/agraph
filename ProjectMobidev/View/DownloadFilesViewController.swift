@@ -13,6 +13,22 @@ protocol ReturnToRoot
     func ReturnToRootViewController(filesContent : [String])
 }
 
+/*
+ This view controller downloads all .csv file selected by the user
+ and checks, if their content is valid.
+ Valid files have this structure:
+ 
+ Title of the graph
+ X Value;Y Value;Z Value;Red Value;Green Value;Blue Value
+ X Value;Y Value;Z Value;Red Value;Green Value;Blue Value
+ X Value;Y Value;Z Value;Red Value;Green Value;Blue Value
+ ...
+ 
+ Where X,Y,Z are a point coordinates and RGB is a color.
+ 
+ Valid graphs are loaded in the mainviewcontroller, where they are rendered.
+*/
+
 class DownloadFilesViewController: UIViewController {
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!

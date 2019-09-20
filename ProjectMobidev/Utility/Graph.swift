@@ -9,6 +9,11 @@
 import Foundation
 import ARKit
 
+/*
+ This class is just a wrapper that implements and stores all features and information
+ related to an ar graph objects.
+*/
+
 class Graph
 {
     static let graphBitMask = 4
@@ -398,6 +403,8 @@ class Graph
             
             if percentage == 1
             {
+                node.geometry?.firstMaterial?.normal.contents = nil
+                node.geometry?.firstMaterial?.diffuse.contents = nil
                 node.removeFromParentNode()
             }
             else

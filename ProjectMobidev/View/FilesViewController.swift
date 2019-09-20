@@ -10,6 +10,12 @@ import UIKit
 import ARKit
 import SwiftyDropbox
 
+/*
+ This view controller displays all .csv files available
+ in the user dropbox; it also converts the content of
+ all downloaded files to graph objects.
+*/
+
 class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ReturnToRoot{
     
     @IBOutlet weak var table: UITableView!

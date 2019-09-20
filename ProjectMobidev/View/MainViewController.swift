@@ -11,7 +11,19 @@ import SceneKit
 import ARKit
 import SwiftyDropbox
 
-//TODO Riscrivere meglio la fase di placing degli oggetti
+/*
+ This viewcontroller manages all the AR features of this app.
+ The app behaviour depends by the working mode; there are
+ 3 different working modes:
+ 
+ - watchingMode: whenever you aim towards a 3d point of a graph, the app
+ updates infolabel, in order to communicate the point value to the user.
+ - placingMode: after had chosen, which graph to plot, this mode allows the
+ user to place ar graphs into the scene, whenever the user aim towards the
+ marker.
+ - editMode: this mode allows to move (by panning) graphs and eventually
+ remove them.
+*/
 
 class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecognizerDelegate, DisplayFileList {
     
@@ -23,7 +35,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var lastAdjustment = Double(0.0)
     
-    var updateFrequency = Double(0.1)
+    var updateFrequency = Double(0.25)
     
     var lastPanLocation = SCNVector3(x: 0, y:0, z:0)
     
@@ -87,13 +99,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Set the view's delegate
         sceneView.delegate = self
 
-        // Create a new scene
         let scene = SCNScene(named: "art.scnassets/GraphScene.scn")!
 
-        // Set the scene to the view
         sceneView.scene = scene
         
         middleScreen = self.view.center
@@ -126,7 +135,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         configuration.detectionImages = trackedImages
         configuration.maximumNumberOfTrackedImages = 1
         
-        // Run the view's session
         sceneView.session.run(configuration)
     }
     
@@ -135,7 +143,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         navigationController?.setNavigationBarHidden(false, animated: animated)
         
-        // Pause the view's session
         sceneView.session.pause()
     }
     
@@ -172,19 +179,25 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         if time - lastAdjustment > updateFrequency
         {
+            
+            /*
+             4 times in a second, this method adjust the world reference
+             system with root node transform.
+             By doing this, we avoid wrong movement vectors, when the user
+             moves ar objects.
+            */
+            
             adjustCoordinateSystem()
             lastAdjustment = time
         }
         
         if currentMode == .placingMode
         {
-            // guarda dove mira e aggiorna il label
             let projectedPoint = getProjectedPoint(location: middleScreen!)
             
             if placeTheGraph
             {
                 guard graphToBePlaced != nil else { return }
-                displayGraphPreview(worldPosition: projectedPoint)
                 graphToBePlaced.setGraphColor(color: UIColor.white)
                 graphToBePlaced = nil
                 
@@ -244,12 +257,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             if node.categoryBitMask == Graph.pointBitMask
             {
-                //printare il punto
                 let relativeGraph = getGraphObject(node: node.parent)
                 
                 if let point = relativeGraph?.getPointsCoordinateForNode(pointNode: node)
                 {
-                    let pointToPrint = String(point.position.x)+", "+String(point.position.y)+", "+String(point.position.z)
+                    let pointToPrint = String(point.position.z)+", "+String(point.position.y)+", "+String(point.position.x)
                     
                     labelModifyCount += 1
                     DispatchQueue.main.async
@@ -561,6 +573,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         return
     }
     
+    /*
+     All ar object displayed are placed on a plane that is parallel
+     to the marker; translation made are costraned on this plane.
+     This method firstly calculate the world posion of a screen point,
+     then it projects that point over the plane that is parallel to the marker.
+     Finally the obtained point is clamped, according to the marker size.
+    */
     func getProjectedPoint(location: CGPoint) -> SCNVector3
     {
         var projectedPoint = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(sceneView.scene.rootNode.transform))
@@ -572,12 +591,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         let normal = getReferencePlaneNormal()
         
-        //proietto il punto sul piano movimento
         projectedPoint!.x += normal.x * distanceFromPlane
         projectedPoint!.y += normal.y * distanceFromPlane
         projectedPoint!.z += normal.z * distanceFromPlane
         
-        //calcolo min max tramite vettori del piano
         var (worldMin, worldMax) = getMinMaxWorldCoordinates()
         
         worldMax.x += normal.x * distanceFromPlane
@@ -588,7 +605,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         worldMin.y += normal.y * distanceFromPlane
         worldMin.z += normal.z * distanceFromPlane
         
-        //clamp
         projectedPoint!.x = simd_clamp(projectedPoint!.x, worldMin.x, worldMax.x)
         projectedPoint!.z = simd_clamp(projectedPoint!.z, -worldMin.z, -worldMax.z)
     
@@ -697,7 +713,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         return -1
     }
 
-    
     func authorizeApp(){
         DropboxClientsManager.authorizeFromController(UIApplication.shared,
                                                       controller: self,
@@ -746,6 +761,10 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         return (worldMin, worldMax)
     }
     
+    /*
+     In placing mode, this method picks the first graph downloaded from
+     dropbox and place it into the arscene, where the user is aiming.
+    */
     func displayGraphPreview(worldPosition: SCNVector3)
     {
         if graphToBePlaced == nil
@@ -816,6 +835,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     {
         if planeRoot != nil
         {
+            planeRoot.geometry?.firstMaterial!.normal.contents = nil
+            planeNode.geometry?.firstMaterial!.normal.contents = nil
+            planeNode.geometry!.firstMaterial!.diffuse.contents = nil
             planeRoot.removeFromParentNode()
             planeNode.removeFromParentNode()
             planeRoot = nil
