@@ -39,7 +39,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var lastPanLocation = SCNVector3(x: 0, y:0, z:0)
     
-    var selectedObject : Graph!
+    var selectedGraph : Graph!
     
     var graphToBePlaced : Graph!
     
@@ -70,6 +70,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         return true
     }
     
+    override var shouldAutorotate: Bool
+    {
+        return false
+    }
+
     @IBAction func prepareForUnwind(segue: UIStoryboardSegue) {
         if graphToCreate.count > 0
         {
@@ -402,7 +407,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                     }
                 }
             }
-            else if node.categoryBitMask != Graph.graphBitMask
+            else if node.categoryBitMask != Graph.graphBitMask && node.categoryBitMask != Graph.pointBitMask
             {
                 disableEditMode()
             }
@@ -430,7 +435,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     @IBAction func panEvent(_ gestureRecognizer: UIPanGestureRecognizer)
     {
-        guard gestureRecognizer.view != nil, planeRoot != nil, currentMode == .editMode, selectedObject != nil else { return }
+        guard gestureRecognizer.view != nil, planeRoot != nil, currentMode == .editMode, selectedGraph != nil else { return }
         
         let location = gestureRecognizer.location(in: sceneView)
         
@@ -455,19 +460,18 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             movementVector.z -= lastPanLocation.z
             
-            var finalPosition = selectedObject.getGraphWorldPosition()
+            var finalPosition = selectedGraph.getGraphWorldPosition()
             
             finalPosition.x += movementVector.x
             
             finalPosition.z += movementVector.z
             
-            selectedObject.setGraphWorldPosition(worldPosition: finalPosition, distanceFromPlane: distanceFromPlane, scene: sceneView)
+            selectedGraph.setGraphWorldPosition(worldPosition: finalPosition, distanceFromPlane: distanceFromPlane, scene: sceneView)
             
             lastPanLocation = currentPanLocation
 
             break
         default:
-            print("stop pan")
             break
         }
     }
@@ -483,8 +487,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             
             guard result != nil else { return }
             
-            selectedObject = getGraphObject(node: result?.node)
-            selectedObject.highlightGraphNode()
+            selectedGraph = getGraphObject(node: result?.node)
+            
+            guard selectedGraph != nil else { return }
+            
+            selectedGraph.highlightGraphNode()
                 
             if currentMode == .watchingMode
             {
@@ -512,20 +519,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         case .changed:
             break
         case .ended:
-            if selectedObject != nil
-            {
-                selectedObject.deselectGraphNode()
-                selectedObject = nil
-            }
-            break
-        case .failed:
-            print("failed")
-            break
-        case .possible:
-            print("possible")
+            guard selectedGraph != nil else { return }
+            selectedGraph.deselectGraphNode()
+            selectedGraph = nil
             break
         default:
-            print("default")
             break
         }
     }
@@ -565,10 +563,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             }
         }
         
-        print("edit mode off")
         stopAllShakingObjects()
         currentMode = .watchingMode
-        selectedObject = nil
+        selectedGraph = nil
         originalScale = 0
         return
     }
@@ -681,28 +678,12 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 }
     }
     
-    func getGraphIndex(graph: SCNNode) -> Int
-    {
-        var i = 0
-        for g in graphs
-        {
-            if graph == g.getGraphNode()
-            {
-                return i
-            }
-            
-            i = i+1
-        }
-        
-        return -1
-    }
-    
     func getRemoveButtonIndex(removeButton: SCNNode) -> Int
     {
         var i = 0
         for g in graphs
         {
-            if removeButton == g.getRemoveButtonNode()
+            if removeButton === g.getRemoveButtonNode()
             {
                 return i
             }

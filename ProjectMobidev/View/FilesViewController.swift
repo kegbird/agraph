@@ -125,6 +125,12 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath)
     {
         tableView.deselectRow(at: indexPath, animated: true)
+        let list = tableView.indexPathsForSelectedRows
+        
+        if list == nil
+        {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+        }
     }
     
     //Utility functions
