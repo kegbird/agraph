@@ -16,7 +16,6 @@
 		704D396F22E1D659000ABF18 /* FileCellTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704D396E22E1D658000ABF18 /* FileCellTableCellView.swift */; };
 		70515A3622EF4BDE00803192 /* DownloadFileListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70515A3522EF4BDE00803192 /* DownloadFileListViewController.swift */; };
 		70515A3822EF697C00803192 /* FilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70515A3722EF697C00803192 /* FilesViewController.swift */; };
-		705224182333D1FC0080A1EB /* 3dPlot.png in Resources */ = {isa = PBXBuildFile; fileRef = 705224172333D1FC0080A1EB /* 3dPlot.png */; };
 		7055503A22F07CEB009D315D /* DownloadFilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7055503922F07CEB009D315D /* DownloadFilesViewController.swift */; };
 		706A0B5C2322837900DB9852 /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706A0B5B2322837900DB9852 /* Graph.swift */; };
 		706A0B5E2322844100DB9852 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706A0B5D2322844100DB9852 /* Point.swift */; };
@@ -43,7 +42,6 @@
 		704D396E22E1D658000ABF18 /* FileCellTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCellTableCellView.swift; sourceTree = "<group>"; };
 		70515A3522EF4BDE00803192 /* DownloadFileListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadFileListViewController.swift; sourceTree = "<group>"; };
 		70515A3722EF697C00803192 /* FilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesViewController.swift; sourceTree = "<group>"; };
-		705224172333D1FC0080A1EB /* 3dPlot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3dPlot.png; sourceTree = "<group>"; };
 		7055503922F07CEB009D315D /* DownloadFilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadFilesViewController.swift; sourceTree = "<group>"; };
 		706A0B5B2322837900DB9852 /* Graph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graph.swift; sourceTree = "<group>"; };
 		706A0B5D2322844100DB9852 /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
@@ -84,7 +82,6 @@
 		700981FC22DF763900BAE499 = {
 			isa = PBXGroup;
 			children = (
-				705224172333D1FC0080A1EB /* 3dPlot.png */,
 				7009820722DF763900BAE499 /* ProjectMobidev */,
 				7009820622DF763900BAE499 /* Products */,
 				0182323BF037E0B640C405E6 /* Pods */,
@@ -229,7 +226,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7009820B22DF763900BAE499 /* art.scnassets in Resources */,
-				705224182333D1FC0080A1EB /* 3dPlot.png in Resources */,
 				7009821522DF763A00BAE499 /* LaunchScreen.storyboard in Resources */,
 				70F1248E2302C79700B92667 /* Assets.xcassets in Resources */,
 				7009821022DF763900BAE499 /* Main.storyboard in Resources */,

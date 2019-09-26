@@ -59,6 +59,9 @@ class DownloadFileListViewController: UIViewController {
                     let extractedFiles = filter.extractFiles()
                     
                     DispatchQueue.main.async { [weak self] in
+                        
+                        guard self != nil else { return }
+                        
                         var files:[Files.Metadata]=[]
                         
                         for file in extractedFiles
@@ -68,7 +71,9 @@ class DownloadFileListViewController: UIViewController {
                         
                         self?.dismiss(animated: true, completion: (
                             { [weak self] in
-                                self?.implementer?.displayDownloadedFileList(files: files)
+                                
+                                guard self != nil else { return }
+                            self?.implementer?.displayDownloadedFileList(files: files)
                             }))
                     }
                 }
@@ -106,6 +111,9 @@ class DownloadFileListViewController: UIViewController {
     {
         DispatchQueue.main.async
             { [weak self] in
+                
+                guard self != nil else { return }
+                
                 self?.activityIndicator.stopAnimating()
                 
                     Alert.DisplayPopUpAndDismiss(viewController: self, title: "Error", message: message, style: .destructive)

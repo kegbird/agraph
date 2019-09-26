@@ -22,7 +22,7 @@ class Graph
     
     static let pointBitMask = 10
     
-    static let buttonOffset : Float = 0.045
+    static let buttonOffset : Float = 0.22
     
     static let titleOffset : Float = 0.18
 
@@ -440,7 +440,7 @@ class Graph
         
         graphNode.position.z = distanceFromPlane
         
-        var removeButtonWorldPosition = graphNode.convertPosition(graphNode.boundingBox.max, to: scene?.scene.rootNode)
+        var removeButtonWorldPosition = worldPosition
         
         removeButtonWorldPosition.x += Graph.buttonOffset
         removeButtonWorldPosition.y += Graph.buttonOffset

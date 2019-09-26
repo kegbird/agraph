@@ -55,6 +55,8 @@ class DownloadFilesViewController: UIViewController {
     {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             
+            guard self != nil else { return }
+            
             let dispatchGroup = DispatchGroup()
             
             for path in self!.filesToDownload
@@ -80,6 +82,9 @@ class DownloadFilesViewController: UIViewController {
                 if CsvChecker.checkContent(fileContent: stringContent)
                 {
                     DispatchQueue.main.async { [weak self] in
+                        
+                        guard self != nil else { return }
+                        
                         self?.filesContents.append(stringContent!)
                         
                         if self?.filesContents.count == self?.filesToDownload.count
@@ -97,6 +102,9 @@ class DownloadFilesViewController: UIViewController {
                 else
                 {
                     DispatchQueue.main.async { [weak self] in
+                        
+                        guard self != nil else { return }
+                        
                         let message = "The file "+path+" is not a valid .csv"
                         
                         Alert.DisplayPopUpAndDismiss(viewController: self, title: "Error", message: message, style: .destructive)
@@ -110,6 +118,9 @@ class DownloadFilesViewController: UIViewController {
             else if error != nil
             {
                 DispatchQueue.main.async { [weak self] in
+                    
+                    guard self != nil else { return }
+                    
                     let message = "An error occured during the download of a file"
                     
                     Alert.DisplayPopUpAndDismiss(viewController: self, title: "Error", message: message, style: .destructive)

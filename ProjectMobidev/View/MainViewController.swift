@@ -90,6 +90,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             let copy = labelModifyCount
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 [weak self] in
+                
+                guard self != nil else { return }
+                
                 if copy == self?.labelModifyCount
                 {
                     self?.updateInfoLabel(infoType: .TapOnAddAdvice)
@@ -208,6 +211,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 DispatchQueue.main.async
                     { [weak self] in
+                        
+                        guard self != nil else { return }
+                        
                         self?.placeTheGraph = false
                         
                         if self?.graphToCreate.count == 0
@@ -221,6 +227,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                 [weak self] in
+                                
+                                guard self != nil else { return }
+                                
                                 if copy == self?.labelModifyCount
                                 {
                                     self?.updateInfoLabel(infoType: .NothingToDo)
@@ -236,6 +245,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             {
                 DispatchQueue.main.async
                 { [weak self] in
+                    
+                    guard self != nil else { return }
+                    
                     self?.updateInfoLabel(infoType: .TapToPlace)
                 }
                 displayGraphPreview(worldPosition: projectedPoint)
@@ -245,6 +257,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             {
                 DispatchQueue.main.async
                 { [weak self] in
+                    
+                    guard self != nil else { return }
+                    
                     self?.updateInfoLabel(infoType: .AimToThePlane)
                     self?.aimOnThePlane = false
                 }
@@ -271,6 +286,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                     labelModifyCount += 1
                     DispatchQueue.main.async
                     { [weak self] in
+                        
+                        guard self != nil else { return }
+                        
                         self?.infoLabel.text = pointToPrint
                     }
                     
@@ -321,6 +339,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             [weak self] in
+            
+            guard self != nil else { return }
+            
             if copy == self?.labelModifyCount
             {
                 self?.updateInfoLabel(infoType: .NothingToDo)
@@ -382,6 +403,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                         [weak self] in
+                        
+                        guard self != nil else { return }
+                        
                         if copy == self?.labelModifyCount
                         {
                             self?.updateInfoLabel(infoType: .AllGraphRemoved)
@@ -399,6 +423,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                         [weak self] in
+                        
+                        guard self != nil else { return }
+                        
                         if copy == self?.labelModifyCount
                         {
                             self?.updateInfoLabel(infoType: .NothingToDo)
@@ -505,6 +532,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     [weak self] in
                     
+                    guard self != nil else { return }
+                    
                     if copy == self?.labelModifyCount
                     {
                         self?.updateInfoLabel(infoType: .NothingToDo)
@@ -555,6 +584,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             [weak self] in
+            
+            guard self != nil else { return }
             
             if copy == self?.labelModifyCount
             {
