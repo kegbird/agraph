@@ -78,7 +78,22 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         let y = Float(values[1]) as Float?
                         let z = Float(values[2]) as Float?
                         
-                        let position = SCNVector3(x: x!, y: y!, z: z!)
+                        var position = SCNVector3(x: x!, y: y!, z: z!)
+                        
+                        if(position.x<0)
+                        {
+                            position.x*=(-1)
+                        }
+                        
+                        if(position.y<0)
+                        {
+                            position.y*=(-1)
+                        }
+                        
+                        if(position.z<0)
+                        {
+                            position.z*=(-1)
+                        }
                         
                         let r = Float(values[3])!/255.0
                         let g = Float(values[4])!/255.0

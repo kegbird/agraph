@@ -281,7 +281,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 if let point = relativeGraph?.getPointsCoordinateForNode(pointNode: node)
                 {
-                    let pointToPrint = String(point.position.z)+", "+String(point.position.y)+", "+String(point.position.x)
+                    let pointToPrint = String(point.position.x)+", "+String(point.position.y)+", "+String(point.position.z)
                     
                     labelModifyCount += 1
                     DispatchQueue.main.async
@@ -564,8 +564,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         let newGraph = graphToCreate.first
             
         graphToCreate.removeFirst()
-        
-        newGraph?.setParentNode(parent: planeNode)
         
         newGraph?.runAppearAnimation()
         

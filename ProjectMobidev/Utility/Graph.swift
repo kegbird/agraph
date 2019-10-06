@@ -106,9 +106,9 @@ class Graph
                 maxY = (points.first?.position.y)!
                 maxZ = (points.first?.position.z)!
                 
-                minX = (points.first?.position.x)!
-                minY = (points.first?.position.y)!
-                minZ = (points.first?.position.z)!
+                minX = 0
+                minY = 0
+                minZ = 0
                 
                 for point in points
                 {
@@ -150,7 +150,7 @@ class Graph
                 
                 if (maxX - minX) != 0
                 {
-                    pointNormalizedPosition.x = 2*(point.position.x - minX) / (maxX - minX)
+                    pointNormalizedPosition.x = 2*(point.position.z - minZ) / (maxZ - minZ)
                 }
                 
                 if (maxY - minY) != 0
@@ -160,7 +160,7 @@ class Graph
                 
                 if (maxZ - minZ) != 0
                 {
-                    pointNormalizedPosition.z = 2*(point.position.z - minZ) / (maxZ - minZ)
+                    pointNormalizedPosition.z = 2*(point.position.x - minX) / (maxX - minX)
                 }
                 
                 if let pointScene = SCNScene(named: "art.scnassets/PointModel.scn")
