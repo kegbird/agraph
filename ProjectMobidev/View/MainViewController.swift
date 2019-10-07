@@ -352,15 +352,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         AudioServicesPlaySystemSound(1108);
     }
     
-    @objc func saveImageCallback(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        
-        if let error = error {
-            print("Error Saving ARKit Scene \(error)")
-        } else {
-            print("ARKit Scene Successfully Saved")
-        }
-    }
-    
     //Gesture recognizer actions
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
