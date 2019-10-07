@@ -43,8 +43,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     var graphToBePlaced : Graph!
     
-    var originalScale = Float(0)
-    
     var aimOnThePlane = false
     
     var placeTheGraph = false
@@ -586,7 +584,6 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         stopAllShakingObjects()
         currentMode = .watchingMode
         selectedGraph = nil
-        originalScale = 0
         return
     }
     
