@@ -7,10 +7,15 @@
 //
 
 import UIKit
+import SceneKit
 
 protocol ReturnToRoot
 {
-    func ReturnToRootViewController(filesContent : [String])
+    var maxNumberOfPoints : Int { get set }
+    
+    var currentNumberOfPoints : Int! { get set }
+    
+    func ReturnToRootViewController(graphs : [Graph])
 }
 
 /*
@@ -27,6 +32,12 @@ protocol ReturnToRoot
  Where X,Y,Z are a point coordinates and RGB is a color.
  
  Valid graphs are loaded in the mainviewcontroller, where they are rendered.
+ 
+ Furthermore, this viewcontroller checks if the number of points that the user
+ wants to add to the scene is under the imposed limit of 1000.
+ This limit avoid the application to run of out memory.
+ If the limit is respected, then it creates all new graph objects, and returns them
+ to the FileViewController.
 */
 
 class DownloadFilesViewController: UIViewController {
@@ -89,11 +100,76 @@ class DownloadFilesViewController: UIViewController {
                         
                         if self?.filesContents.count == self?.filesToDownload.count
                         {
-                            self?.implementer.ReturnToRootViewController(filesContent: self!.filesContents)
+                            var graphsToCreate : [Graph] = []
                             
+                            var pointCounter = 0
+                            
+                            let maxNumberOfPoints = self!.implementer.maxNumberOfPoints
+                            
+                            let currentNumberOfPoints = self!.implementer.currentNumberOfPoints
+                            
+                            for file in self!.filesContents
+                            {
+                                var data = file.components(separatedBy: .newlines)
+                                
+                                let title = data.first ?? ""
+                                
+                                var points : [Point] = []
+                                
+                                data.removeFirst()
+                                
+                                data.removeAll(where: {$0 == ""})
+                                
+                                pointCounter = pointCounter + data.count
+                                
+                                if pointCounter + currentNumberOfPoints! > maxNumberOfPoints
+                                {
+                                    Alert.DisplayPopUpAndDismiss(viewController: self!, title: "Error", message: "Too many points to be rendered! Remove some graphs before add others.", style: .destructive)
+                                    return
+                                }
+                                
+                                for line in data
+                                {
+                                    let values = line.components(separatedBy: ";")
+                                    
+                                    let x = Float(values[0]) as Float?
+                                    let y = Float(values[1]) as Float?
+                                    let z = Float(values[2]) as Float?
+                                    
+                                    var position = SCNVector3(x: x!, y: y!, z: z!)
+                                    
+                                    if(position.x<0)
+                                    {
+                                        position.x*=(-1)
+                                    }
+                                    
+                                    if(position.y<0)
+                                    {
+                                        position.y*=(-1)
+                                    }
+                                    
+                                    if(position.z<0)
+                                    {
+                                        position.z*=(-1)
+                                    }
+                                    
+                                    let r = Float(values[3])!/255.0
+                                    let g = Float(values[4])!/255.0
+                                    let b = Float(values[5])!/255.0
+                                    
+                                    let color = UIColor(red: CGFloat(r), green: CGFloat(g), blue:CGFloat(b), alpha: CGFloat(1))
+                                    
+                                    let point = Point(position: position, color: color)
+                                    
+                                    points.append(point)
+                                }
+                                
+                                graphsToCreate.append(Graph(title: title, points: points))
+                            }
+                            
+                            self?.implementer.ReturnToRootViewController(graphs: graphsToCreate)
+                                
                             self?.dismiss(animated: true, completion: nil)
-                            
-                            
                         }
                     }
                     

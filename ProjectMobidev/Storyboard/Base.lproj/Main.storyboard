@@ -164,6 +164,7 @@
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="btnAddTouchDown:" destination="BV1-FR-VrT" eventType="touchUpInside" id="6NA-K1-msb"/>
+                                    <action selector="btnAddTouchDown:" destination="BV1-FR-VrT" eventType="touchUpOutside" id="bKD-iO-VWI"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="70X-Qk-YCZ" userLabel="btnTakePhoto" customClass="UIRoundButton" customModule="AGraph" customModuleProvider="target">

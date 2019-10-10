@@ -12,11 +12,14 @@ import SwiftyDropbox
 
 /*
  This view controller displays all .csv files available
- in the user dropbox; it also converts the content of
- all downloaded files to graph objects.
+ in the user dropbox.
 */
 
 class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ReturnToRoot{
+    
+    var maxNumberOfPoints: Int = 1000
+    
+    var currentNumberOfPoints: Int!
     
     @IBOutlet weak var table: UITableView!
 
@@ -52,63 +55,16 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         else if segue.identifier == "returnToRoot"
         {
-            let destination = segue.destination as! MainViewController
-            
-            if let files = sender as? [String]
+            if let graphs = sender as? [Graph]
             {
-                var graphToCreate : [Graph] = []
+                let destination = segue.destination as! MainViewController
                 
-                for file in files
+                for graph in graphs
                 {
-                    var data = file.components(separatedBy: .newlines)
-                    
-                    let title = data.first ?? ""
-                    
-                    var points : [Point] = []
-                    
-                    data.removeFirst()
-                    
-                    data.removeAll(where: {$0 == ""})
-                    
-                    for line in data
-                    {
-                        let values = line.components(separatedBy: ";")
-                        
-                        let x = Float(values[0]) as Float?
-                        let y = Float(values[1]) as Float?
-                        let z = Float(values[2]) as Float?
-                        
-                        var position = SCNVector3(x: x!, y: y!, z: z!)
-                        
-                        if(position.x<0)
-                        {
-                            position.x*=(-1)
-                        }
-                        
-                        if(position.y<0)
-                        {
-                            position.y*=(-1)
-                        }
-                        
-                        if(position.z<0)
-                        {
-                            position.z*=(-1)
-                        }
-                        
-                        let r = Float(values[3])!/255.0
-                        let g = Float(values[4])!/255.0
-                        let b = Float(values[5])!/255.0
-                        
-                        let color = UIColor(red: CGFloat(r), green: CGFloat(g), blue: CGFloat(b), alpha: CGFloat(1))
-                        
-                        let point = Point(position: position, color: color)
-                        
-                        points.append(point)
-                    }
-                    
-                    graphToCreate.append(Graph(title: title, points: points))
+                    destination.graphs.append(graph)
                 }
-                destination.graphToCreate = graphToCreate
+                
+                destination.graphToCreate = graphs.count
             }
         }
     }
@@ -171,8 +127,8 @@ class FilesViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     //Protocol stub
     
-    func ReturnToRootViewController(filesContent : [String]) {
-        performSegue(withIdentifier: "returnToRoot", sender: filesContent)
+    func ReturnToRootViewController(graphs : [Graph]) {
+        performSegue(withIdentifier: "returnToRoot", sender: graphs)
     }
 
 }

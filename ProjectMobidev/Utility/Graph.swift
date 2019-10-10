@@ -419,6 +419,11 @@ class Graph
         titleNode.runAction(fadeAnimation)
     }
     
+    func getPointsCount() -> Int
+    {
+        return points.count
+    }
+    
     func getPointsCoordinateForNode(pointNode : SCNNode) -> Point?
     {
         for p in points

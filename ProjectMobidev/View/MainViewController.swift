@@ -29,38 +29,54 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     @IBOutlet var sceneView: ARSCNView!
     
+    //This is the label used to print messages for the user
     @IBOutlet var infoLabel: UILabel!
     
+    //It's a enum that states the working mode of the application
     var currentMode : WorkingMode = .watchingMode
     
+    //It stores the last adjustment of the world coordinate system
     var lastAdjustment = Double(0.0)
     
+    //This states the frequency with which the world coordinate system is updated
     var updateFrequency = Double(0.25)
     
+    //This is the last pan location (in world coordinates)
     var lastPanLocation = SCNVector3(x: 0, y:0, z:0)
     
+    //This is the reference of the graph moved in edit mode
     var selectedGraph : Graph!
     
+    //This is the reference of the graph to be placed in placing mode
     var graphToBePlaced : Graph!
     
+    //Is the user aiming at the marker or not?
     var aimOnThePlane = false
     
+    //This variable indicates that the user has confirmed the position of the graph
+    //in placing mode
     var placeTheGraph = false
     
+    //A support variable needed to update correctly infoLabel
     var labelModifyCount : Int = 0
     
+    //This array contains all graph displayed in the scene
+    //and those that are to be placed in placing mode.
     var graphs : [Graph] = []
 
-    var graphToCreate : [Graph] = []
+    //This variable indicates how many graph needs to be placed in placing mode
+    var graphToCreate : Int = 0
     
     var planeRoot : SCNNode!
     
     var planeNode : SCNNode!
     
+    //It's the distance of graphs from the reference plane; the reference plane is the black plane displayed over the marker.
     let distanceFromPlane : Float = 0.3
     
     var middleScreen : CGPoint!
     
+    //Used to clear the infoLabel
     var valuePrinted = false
     
     override var prefersStatusBarHidden: Bool
@@ -74,9 +90,15 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     }
 
     @IBAction func prepareForUnwind(segue: UIStoryboardSegue) {
-        if graphToCreate.count > 0
+        
+        /*
+         Each time an unwind segue occurs, the application checks if there are
+         new graphs to display.
+         If graphToCreate > 0, then the app must run in placing mode, otherwise the app is in watching mode.
+         */
+        
+        if graphToCreate > 0
         {
-            graphs.append(contentsOf: graphToCreate)
             currentMode = .placingMode
             updateInfoLabel(infoType: .AimToThePlane)
         }
@@ -93,7 +115,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 if copy == self?.labelModifyCount
                 {
-                    self?.updateInfoLabel(infoType: .TapOnAddAdvice)
+                    self?.updateInfoLabel(infoType: .NoGraphAdded)
                     self?.labelModifyCount = 0
                 }
             }
@@ -113,6 +135,11 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         middleScreen = self.view.center
         
+        /*
+         The notification center is used to perform the segue to the FilesViewController, when the user authorize the application
+         to write, read, modify files from the user's dropbox.
+         */
+        
         if Dropbox.getDropboxClient() == nil
             {
             NotificationCenter.default.addObserver(
@@ -128,6 +155,8 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         super.viewWillAppear(animated)
         
         navigationController?.setNavigationBarHidden(true, animated: true)
+        
+         //Everytime the view appears, a new session is launched.
         
         let configuration = ARWorldTrackingConfiguration()
         
@@ -161,14 +190,33 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         }
         else if segue.identifier == "toFilesTableViewController"
         {
+            /*
+             If the download of the csv list from the user dropbox succeeds,
+             the application loads the table view of the FilesViewController
+             this list.
+            */
             let destination = segue.destination as! FilesViewController
+            
+            var currentNumberOfPoints = 0
+            
+            for graph in graphs
+            {
+                currentNumberOfPoints = currentNumberOfPoints + graph.getPointsCount()
+            }
+            
             destination.files = sender as! [Files.Metadata]
+            destination.currentNumberOfPoints = currentNumberOfPoints
         }
     }
     
     //AR Events
     
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+        
+        /*
+         This method makes appear the reference plane in each ar session.
+         It's called only the first time, the marker is viewed by the camera.
+         */
         
         let node = SCNNode()
         
@@ -199,8 +247,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         
         if currentMode == .placingMode
         {
-            let projectedPoint = getProjectedPoint(location: middleScreen!)
+            /*
+             In placing mode, the app gets the projected point of the middle screen;
+             with that point, the graph preview can be placed and moved.
+             */
             
+            let projectedPoint = getProjectedPoint(location: middleScreen!)
+
             if placeTheGraph
             {
                 guard graphToBePlaced != nil else { return }
@@ -214,7 +267,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                         
                         self?.placeTheGraph = false
                         
-                        if self?.graphToCreate.count == 0
+                        if self?.graphToCreate == 0
                         {
                             self?.currentMode = .watchingMode
                             
@@ -265,6 +318,14 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         }
         else if currentMode == .watchingMode
         {
+            /*
+             In watching mode, for every frame, the application performs an hit test from the middle
+             screen towards the ar scene.
+             If the hit test returns an scnnode, then it checks if this node is a point of a graph,
+             by comparing its bitmask with a specific value (Graph.pointBitMask).
+             With the point, the application can get his 3d coordinates.
+            */
+            
             let result = sceneView.hitTest(middleScreen!, options: [SCNHitTestOption.categoryBitMask : Graph.pointBitMask]).first
             
             guard let node = result?.node
@@ -279,7 +340,7 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 
                 if let point = relativeGraph?.getPointsCoordinateForNode(pointNode: node)
                 {
-                    let pointToPrint = String(point.position.x)+", "+String(point.position.y)+", "+String(point.position.z)
+                    let pointToPrint = String(format: "%.2f, %.2f, %.2f", point.position.x, point.position.y, point.position.z)
                     
                     labelModifyCount += 1
                     DispatchQueue.main.async
@@ -550,13 +611,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
     
     func displayNewGraph(worldPosition: SCNVector3) -> Graph?
     {
-        let newGraph = graphToCreate.first
-            
-        graphToCreate.removeFirst()
+        let newGraph = graphs[graphs.count-graphToCreate]
         
-        newGraph?.runAppearAnimation()
+        graphToCreate = graphToCreate - 1
         
-        newGraph?.setGraphWorldPosition(worldPosition: worldPosition, distanceFromPlane: distanceFromPlane, scene: sceneView)
+        newGraph.runAppearAnimation()
+        
+        newGraph.setGraphWorldPosition(worldPosition: worldPosition, distanceFromPlane: distanceFromPlane, scene: sceneView)
         
         return newGraph
     }
@@ -587,15 +648,16 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         return
     }
     
-    /*
-     All ar object displayed are placed on a plane that is parallel
-     to the marker; translation made are costraned on this plane.
-     This method firstly calculate the world posion of a screen point,
-     then it projects that point over the plane that is parallel to the marker.
-     Finally the obtained point is clamped, according to the marker size.
-    */
     func getProjectedPoint(location: CGPoint) -> SCNVector3
     {
+        /*
+         All ar object displayed are placed on a plane that is parallel
+         to the marker; translation made are costraned on this plane.
+         This method firstly calculate the world posion of a screen point,
+         then it projects that point over the plane that is parallel to the marker.
+         Finally the obtained point is clamped, according to the marker size.
+         */
+        
         var projectedPoint = sceneView.unprojectPoint(location, ontoPlane: simd_float4x4(sceneView.scene.rootNode.transform))
         
         if projectedPoint == nil
@@ -686,7 +748,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
                 node.categoryBitMask = 0
                 
                 planeRoot = node
-            
+        
+                /*
+                Since everytime the app changes view, the session ends, it
+                has to restore all graphs object, whenever the user aim towards
+                the marker.
+                */
+        
                 for graph in graphs
                 {
                     planeNode.addChildNode(graph.getGraphNode())
@@ -759,12 +827,13 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
         return (worldMin, worldMax)
     }
     
-    /*
-     In placing mode, this method picks the first graph downloaded from
-     dropbox and place it into the arscene, where the user is aiming.
-    */
     func displayGraphPreview(worldPosition: SCNVector3)
     {
+        /*
+         In placing mode, this method picks the first graph downloaded from
+         dropbox and place it into the arscene, where the user is aiming.
+         */
+        
         if graphToBePlaced == nil
         {
             graphToBePlaced = displayNewGraph(worldPosition: worldPosition)
@@ -823,7 +892,9 @@ class MainViewController: UIViewController, ARSCNViewDelegate, UIGestureRecogniz
             break
         case .PhotoTaken:
             infoLabel.text = "Photo taken!"
+            break
         default:
+            infoLabel.text = "No graph added"
             break
         }
         

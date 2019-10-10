@@ -9,6 +9,7 @@
 enum InfoUpdate {
     case PhotoTaken
     case TapOnAddAdvice
+    case NoGraphAdded
     case AllGraphRemoved
     case NothingToDo
     case AimToThePlane
