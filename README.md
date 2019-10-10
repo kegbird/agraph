@@ -81,7 +81,8 @@ For each graph, tap on the screen to confirm their positions.
 
 When you place all the graph, you can read each point position, by just aiming at it.
 
-A long press over the graph will let you also to move graphs onto the blackboard.
+A long press over the graph will let you enable the edit mode; in edit mode, graphs can
+be moved with the pan gesture.
 
 You can take photos of the ar scene, by tapping on the camera button.
 
