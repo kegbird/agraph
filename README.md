@@ -69,40 +69,40 @@ The marker image is in "/Image/marker.jpeg".
 
 To plot graph with AGraph you must first tap on the add button, in the bottom right of the screen.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/1.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/1.PNG)
 
 If it's the first time that you use it, AGraph will ask you to access to your Dropbox folder.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/2.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/2.PNG)
 
 If the authentication is succesful, then the app will display all .csv files, presents in your dropbox.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/3.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/3.PNG)
 
 Choose one or more graphs to display.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/4.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/4.PNG)
 
 Finally aim towards the marker, until a graph will appear.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/5.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/5.PNG)
 
 For each graph, tap on the screen to confirm their positions.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/6.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/6.PNG)
 
 When you place all the graph, you can read each point position, by just aiming at it.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/7.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/7.PNG)
 
 A long press over the graph will let you enable the edit mode; in edit mode, graphs can
 be moved with the pan gesture.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/8.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/8.PNG)
 
 You can take photos of the ar scene, by tapping on the camera button.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/9.png)
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/9.PNG)
 
 # Application limits
 
