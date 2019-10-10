@@ -73,11 +73,7 @@ To plot graph with AGraph you must first tap on the add button, in the bottom ri
 
 If it's the first time that you use it, AGraph will ask you to access to your Dropbox folder.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/2.PNG)
-
 If the authentication is succesful, then the app will display all .csv files, presents in your dropbox.
-
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/3.PNG)
 
 Choose one or more graphs to display.
 
