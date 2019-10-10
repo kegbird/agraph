@@ -69,26 +69,45 @@ The marker image is in "/Image/marker.jpeg".
 
 To plot graph with AGraph you must first tap on the add button, in the bottom right of the screen.
 
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/1.png)
+
 If it's the first time that you use it, AGraph will ask you to access to your Dropbox folder.
+
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/2.png)
 
 If the authentication is succesful, then the app will display all .csv files, presents in your dropbox.
 
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/3.png)
+
 Choose one or more graphs to display.
+
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/4.png)
 
 Finally aim towards the marker, until a graph will appear.
 
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/5.png)
+
 For each graph, tap on the screen to confirm their positions.
 
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/6.png)
+
 When you place all the graph, you can read each point position, by just aiming at it.
+
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/7.png)
 
 A long press over the graph will let you enable the edit mode; in edit mode, graphs can
 be moved with the pan gesture.
 
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/8.png)
+
 You can take photos of the ar scene, by tapping on the camera button.
+
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/9.png)
 
 # Application limits
 
 The application runs smoothly, with no fps drops if the overall number of
 points drawn is under 900.
+
 The application itself could drawn up to 1200
 This limit is valid for Iphone 6s.
