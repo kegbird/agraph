@@ -29,36 +29,30 @@ The first line is the title that will display over the graph, while all lines un
 This example may clarify everything:
 
 Diagonal
-
 0;0;0;255;238;75
-
 10;10;10;255;74;74
-
 20;20;20;100;228;255
-
 30;30;30;76;255;124
-
 40;40;40;255;103;164
-
 50;50;50;255;238;75
-
 60;60;60;255;74;74
-
 70;70;70;100;228;255
-
 80;80;80;76;255;124
-
 90;90;90;255;103;164
-
 100;100;100;255;238;75
 
 And this is what the application produces:
 
-Some examples are available in the directory "/Examples/".
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/example.jpg)
+
+Some examples are available in the directory "/Examples/"; to make available to the app your graphs,
+just put them into your dropbox as .csv files.
 
 # Application usage
 
 The application plots graphs over this image marker:
+
+![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/marker.jpeg)
 
 The marker image is in "/Image/marker.jpeg".
 
