@@ -55,7 +55,9 @@ Diagonal
 
 And this is what the application produces:
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/example.jpg)
+<p align="center">
+  <img width="375" height="667" src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/example.jpg">
+</p>
 
 Some examples are available in the directory "/Examples/"; to make available to the app your graphs,
 just put them into your dropbox as .csv files.
@@ -64,7 +66,9 @@ just put them into your dropbox as .csv files.
 
 The application plots graphs over this image marker:
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/marker.jpeg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/marker.jpeg">
+</p>
 
 The marker image is in "/Image/marker.jpeg".
 
@@ -72,36 +76,53 @@ Graphs are positioned in front of the marker, in this way:
 
 To plot graph with AGraph you must first tap on the add button, in the bottom right of the screen.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/1.PNG)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/1.PNG">
+</p>
 
 If it's the first time that you use it, AGraph will ask you to access to your Dropbox folder.
 
-If the authentication is succesful, then the app will display all .csv files, presents in your dropbox.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/2.PNG">
+</p>
 
+If the authentication is succesful, then the app will display all .csv files, presents in your dropbox.
 Choose one or more graphs to display.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/4.PNG)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/3.PNG">
+</p>
 
 Finally aim towards the marker, until a graph will appear.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/5.PNG)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/4.PNG">
+</p>
 
 For each graph, tap on the screen to confirm their positions.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/6.PNG)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/5.PNG">
+</p>
 
 When you place all the graph, you can read each point position, by just aiming at it.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/7.PNG)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/6.PNG">
+</p>
 
 A long press over the graph will let you enable the edit mode; in edit mode, graphs can
 be moved with the pan gesture.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/8.PNG)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/7.PNG">
+</p>
 
 You can take photos of the ar scene, by tapping on the camera button.
 
-![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/9.PNG)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/8.PNG">
+</p>
 
 # Application limits
 
