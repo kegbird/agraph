@@ -22,6 +22,8 @@ To add all missing dependencies, run 'pod install' from the project directory.
 
 At the end of the process, open 'ProjectMobidev.xcworkspace' with XCode.
 
+The app has been developed for <b>iOS 12.2</b>.
+
 # Graph format
 
 Each csv must store points in this structure, in order to be recognized by the application:
@@ -66,7 +68,7 @@ And this is what the application produces:
   <img width="375" height="667" src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/example.jpg">
 </p></br>
 
-Some examples are available in the directory "/Examples/"; to make available to the app your graphs,
+Some examples are available in the directory <a href="https://github.com/Kegbird/ProjectMobidev/tree/master/Examples">"/Examples/"</a>; to make available to the app your graphs,
 just put them into your dropbox as .csv files.
 
 # Application usage
