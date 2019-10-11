@@ -1,10 +1,18 @@
-# WIP README
 # AGraph
 
 This is a simple swift app, developed for the course "Sviluppo applicazioni per dispositivi mobili".
 
-This app allows to place and render agumented 3d graphs (described by csv tables on a dropbox directory)
+This app allows to place and render agumented 3d graphs (described by csv tables stored in a dropbox directory)
 through an iphone camera.
+
+# Application features
+
+The application can:
+<ul>
+  <li><b>Display 3d graphs described by csv files</b></li>
+  <li><b>Move or remove 3d graphs from the Agmented Reality scene</b></li>
+  <li><b>Take picture of the Agmented Reality scene</b></li>
+</ul>
 
 # Project Usage
 
@@ -55,9 +63,9 @@ Diagonal
 
 And this is what the application produces:
 
-<p align="center">
+</br><p align="center">
   <img width="375" height="667" src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/example.jpg">
-</p>
+</p></br>
 
 Some examples are available in the directory "/Examples/"; to make available to the app your graphs,
 just put them into your dropbox as .csv files.
@@ -66,9 +74,9 @@ just put them into your dropbox as .csv files.
 
 The application plots graphs over this image marker:
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/marker.jpeg">
-</p>
+</p></br>
 
 The marker image is in "/Image/marker.jpeg".
 
@@ -76,58 +84,59 @@ Graphs are positioned in front of the marker, in this way:
 
 To plot graph with AGraph you must first tap on the add button, in the bottom right of the screen.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/1.PNG">
-</p>
+</p></br>
 
 If it's the first time that you use it, AGraph will ask you to access to your Dropbox folder.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/2.PNG">
-</p>
+</p></br>
 
 If the authentication is succesful, then the app will display all .csv files, presents in your dropbox.
 Choose one or more graphs to display.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/3.PNG">
-</p>
+</p></br>
 
 Finally aim towards the marker, until a graph will appear.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/4.PNG">
-</p>
+</p></br>
 
 For each graph, tap on the screen to confirm their positions.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/5.PNG">
-</p>
+</p></br>
 
 When you place all the graph, you can read each point position, by just aiming at it.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/6.PNG">
-</p>
+</p></br>
 
 A long press over the graph will let you enable the edit mode; in edit mode, graphs can
 be moved with the pan gesture.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/7.PNG">
-</p>
+</p></br>
 
 You can take photos of the ar scene, by tapping on the camera button.
 
-<p align="center">
+</br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/8.PNG">
-</p>
+</p></br>
 
 # Application limits
 
-The application runs smoothly, with no fps drops if the overall number of
+The application runs smoothly, with no fps drops, if the overall number of
 points drawn is under 900.
 
-The application itself could drawn up to 1200
-This limit is valid for Iphone 6s.
+The application doesn't let to display more than 1000 points, for stability reasons.
+
+This limit derives from a sequence of tests, done on an Iphone 6S.
