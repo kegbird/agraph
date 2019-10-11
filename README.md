@@ -27,11 +27,10 @@ At the end of the process, open 'ProjectMobidev.xcworkspace' with XCode.
 Each csv must store points in this structure, in order to be recognized by the application:
 
 Title of the graph
+
 x;y;z;r;g;b
+
 x;y;z;r;g;b
-.
-.
-.
 
 The first line is the title that will display over the graph, while all lines under are 3d points with their relative colors.
 
