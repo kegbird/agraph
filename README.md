@@ -10,8 +10,9 @@ through an iphone camera.
 The application can:
 <ul>
   <li><b>Display 3d graphs described by csv files</b></li>
-  <li><b>Move or remove 3d graphs from the Agmented Reality scene</b></li>
-  <li><b>Take picture of the Agmented Reality scene</b></li>
+  <li><b>Move or remove 3d graphs from the Augmented Reality scene</b></li>
+  <li><b>Take picture of the Augmented Reality scene</b></li>
+  <li><b>Print coordinates of Augmented 3d points</b></li>
 </ul>
 
 # Project Usage
