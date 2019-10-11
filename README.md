@@ -1,3 +1,4 @@
+# WIP README
 # AGraph
 
 This is a simple swift app, developed for the course "Sviluppo applicazioni per dispositivi mobili".
@@ -5,7 +6,7 @@ This is a simple swift app, developed for the course "Sviluppo applicazioni per 
 This app allows to place and render agumented 3d graphs (described by csv tables on a dropbox directory)
 through an iphone camera.
 
-# Usage
+# Project Usage
 
 The project uses SwiftyDropbox libraries, to access, retriev and download files from a dropbox directory.
 
@@ -66,6 +67,8 @@ The application plots graphs over this image marker:
 ![alt text](https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/marker.jpeg)
 
 The marker image is in "/Image/marker.jpeg".
+
+Graphs are positioned in front of the marker, in this way:
 
 To plot graph with AGraph you must first tap on the add button, in the bottom right of the screen.
 
