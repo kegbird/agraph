@@ -89,7 +89,7 @@ class Graph
             return
         }
         
-        //normalizzo i dati
+        // Points coordinates are normalized with the classical min/max normalization
         if points.count > 0
         {
             var maxX : Float = 0
@@ -146,6 +146,12 @@ class Graph
             
             for point in points
             {
+                /* pointsNormalizedPosition is the local position
+                 in the space of the graph model.
+                 It's multiplied by 2 and subtracted of 1, in order to place
+                 all points, respected the origin of the model, since the
+                 pivot of the model is in the middle of the cube.
+                */
                 var pointNormalizedPosition = point.position
                 
                 if (maxX - minX) != 0
