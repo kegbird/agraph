@@ -115,14 +115,14 @@ For each graph, tap on the screen to confirm their positions.
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/5.PNG">
 </p></br>
 
-When you place all the graph, you can read each point position, by just aiming at it.
+After you placed all graphs, you can read each point position by just aiming at it.
 
 </br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/6.PNG">
 </p></br>
 
-A long press over the graph will let you enable the edit mode; in edit mode, graphs can
-be moved with the pan gesture.
+A long press over a graph will let you enable the edit mode; in edit mode, all graphs can
+be moved with by panning.
 
 </br><p align="center">
   <img src="https://raw.githubusercontent.com/KegBird/ProjectMobidev/master/Images/Tutorial/7.PNG">
