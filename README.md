@@ -17,7 +17,7 @@ The application can:
 
 # Project Usage
 
-The project uses SwiftyDropbox libraries, to access, retriev and download files from a dropbox directory.
+The project uses SwiftyDropbox libraries, to access, retrieve and download files from a dropbox directory.
 
 To add all missing dependencies, run 'pod install' from the project directory.
 
