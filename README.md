@@ -2,7 +2,7 @@
 
 This is a swift app developed for the course "Sviluppo applicazioni per dispositivi mobili" which uses some powerful features of Arkit framework.
 
-This app allows to place and render agumented 3d graphs (described by csv tables stored in a dropbox directory)
+aGraphs allows to place and render agumented 3d graphs (described by csv tables stored in a dropbox directory)
 through an iphone camera.
 
 # Application features
